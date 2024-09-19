@@ -20,7 +20,6 @@ const setInserir = async function(dadosEmpresa, contentType){
        
             // validação de campos obrigatorios ou com digitação inválida
             if(dadosEmpresa.nome_empresa == ''    || dadosEmpresa.nome_empresa == undefined       ||  dadosEmpresa.nome_empresa == null               || dadosEmpresa.nome_empresa.length > 100 ||
-                dadosEmpresa.nome == ''    || dadosEmpresa.nome == undefined       ||  dadosEmpresa.nome == null               || dadosEmpresa.nome.length > 100 ||
                 dadosEmpresa.nome_proprietario == ''    || dadosEmpresa.nome_proprietario == undefined       ||  dadosEmpresa.nome_proprietario == null               || dadosEmpresa.nome_proprietario.length > 100 ||
                dadosEmpresa.email == ''  ||   dadosEmpresa.email == undefined  || dadosEmpresa.email == null   || dadosEmpresa.email.length > 320 ||
                dadosEmpresa.senha == '' ||  dadosEmpresa.senha == undefined || dadosEmpresa.senha == null  || dadosEmpresa.senha.length > 255 ||
@@ -31,8 +30,6 @@ const setInserir = async function(dadosEmpresa, contentType){
 
             ){
 
-
-               
                 // return do status code 400
                 return message.ERROR_REQUIRED_FIELDS
                

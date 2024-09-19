@@ -8,7 +8,6 @@ const insert = async function(dadosEmpresa){
     try {
         const sql = `CALL sp_inserir_empresa_com_endereco(
             '${dadosEmpresa.nome_empresa}',
-            '${dadosEmpresa.nome}',
             '${dadosEmpresa.nome_proprietario}',
             '${dadosEmpresa.email}',
             '${dadosEmpresa.senha}',
