@@ -39,6 +39,9 @@ const bodyParserJSON = bodyParser.json()
     const controllerUsuario = require('./controller/controller_usuario.js')
     const controllerEmpresa = require('./controller/controller_empresa.js')
     const controllerMedico = require('./controller/controller_medico.js')
+    const controllerEspecialidade = require('./controller/controller_especialidade.js')
+    const controllerVideo = require('./controller/controller_video.js')
+
 
 /*********************** USUARIO ***********************************/
     app.post('/v1/vital/usuario', cors(), bodyParserJSON, async function (request, response,next ){
@@ -266,6 +269,112 @@ const bodyParserJSON = bodyParser.json()
     })
 
     /*********************** ESPECIALIDADES ***********************************/
+    app.get('/v1/vital/especialidade', cors(),async function (request,response,next){
+
+
+        // chama a função da controller para retornar os filmes;
+        let dadosEspecialidade = await controllerEspecialidade.setListar()
+   
+        // validação para retornar o Json dos filmes ou retornar o erro 404;
+        if(dadosEspecialidade){
+            response.json(dadosEspecialidade);
+            response.status(dadosEspecialidade.status_code);
+        }else{
+            response.json({message: 'Nenhum registro foi encontrado'});
+            response.status(404);
+        }
+    });
+
+    app.get('/v1/vital/especialidade/:id', cors(), async function(request,response,next){
+
+        // recebe o id da requisição
+        let idEspecialidade = request.params.id
+    
+        //encaminha o id para a acontroller buscar o filme
+        let dadosEspecialidade = await controllerEspecialidade.setListarPorId(idEspecialidade)
+    
+        response.status(dadosEspecialidade.status_code);
+        response.json(dadosEspecialidade);
+    })
+
+    app.delete('/v1/vital/especialidade/:id', cors (), async function (request,response,next){
+
+        let idEspecialidade = request.params.id
+    
+        let dadosEspecialidade = await controllerEspecialidade.setDeletar(idEspecialidade);
+    
+        response.status(dadosEspecialidade.status_code);
+        response.json(dadosEspecialidade)
+    })
+
+     /*********************** VIDEOS ***********************************/
+     app.post('/v1/vital/video', cors(), bodyParserJSON, async function (request, response,next ){
+
+
+        // recebe o ContentType com os tipos de dados encaminhados na requisição
+        let contentType = request.headers['content-type'];
+   
+        // vou receber o que chegar no corpo da requisição e guardar nessa variável local
+        let dadosBody = request.body;
+        // encaminha os dados para a controller enviar para o DAO
+        let resultDadosNovoVideo = await controllerVideo.setInserir(dadosBody, contentType)
+   
+   
+        response.status(resultDadosNovoVideo.status_code);
+        response.json(resultDadosNovoVideo);
+   
+    })
+
+    app.get('/v1/vital/video', cors(),async function (request,response,next){
+
+
+        // chama a função da controller para retornar os filmes;
+        let dadosVideo = await controllerVideo.setListar()
+   
+        // validação para retornar o Json dos filmes ou retornar o erro 404;
+        if(dadosVideo){
+            response.json(dadosVideo);
+            response.status(dadosVideo.status_code);
+        }else{
+            response.json({message: 'Nenhum registro foi encontrado'});
+            response.status(404);
+        }
+    });
+
+    app.get('/v1/vital/video/:id', cors(), async function(request,response,next){
+
+        // recebe o id da requisição
+        let idVideo = request.params.id
+    
+        //encaminha o id para a acontroller buscar o filme
+        let dadosVideo = await controllerVideo.setListarPorId(idVideo)
+    
+        response.status(dadosVideo.status_code);
+        response.json(dadosVideo);
+    })
+
+    app.delete('/v1/vital/video/:id', cors (), async function (request,response,next){
+
+        let idVideo = request.params.id
+    
+        let dadosVideo = await controllerVideo.setDeletar(idVideo);
+    
+        response.status(dadosVideo.status_code);
+        response.json(dadosVideo)
+    })
+
+    app.put('/v1/vital/videoAtualizar/:id', cors(), bodyParserJSON, async function(request,response,next){
+
+        let idVideo = request.params.id
+        let contentType = request.headers['content-type'];
+        let dadosBody = request.body
+    
+        let resultUptadeVideo = await controllerVideo.setAtualizar(idVideo, dadosBody, contentType)
+    
+        response.status(resultUptadeVideo.status_code)
+        response.json(resultUptadeVideo)
+    
+    })
 
     app.listen('8080', function(){
         console.log('API funcionando!!')

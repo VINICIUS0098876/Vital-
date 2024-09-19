@@ -6,13 +6,14 @@ const prisma = new PrismaClient()
 
 const insert = async function(dadosMedico){
     try {
-        const sql = `CALL sp_inserir_medico_ultima_empresa(
+        const sql = `CALL sp_inserir_medico_com_especialidades(
             '${dadosMedico.nome}',
             '${dadosMedico.email}',
             '${dadosMedico.senha}',
             '${dadosMedico.telefone}',
             '${dadosMedico.crm}',
-            '${dadosMedico.data_nascimento}'
+            '${dadosMedico.data_nascimento}',
+            '${dadosMedico.especialidades}'
         );
         `
         console.log(sql)

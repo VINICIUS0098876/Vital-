@@ -34,14 +34,14 @@ drop procedure sp_inserir_empresa_com_endereco;
 DELIMITER $$
 
 CREATE PROCEDURE sp_inserir_empresa_com_endereco(
-IN p_nome_empresa VARCHAR(255),
+    IN p_nome_empresa VARCHAR(255),
     IN p_nome_proprietario VARCHAR(255),
     IN p_email VARCHAR(320),
     IN p_senha VARCHAR(15),
     IN p_cnpj VARCHAR(255),
     IN p_telefone VARCHAR(20),
     IN p_telefone_clinica VARCHAR(255),
-IN p_cep VARCHAR(20),
+    IN p_cep VARCHAR(20),
     IN p_logradouro VARCHAR(255),
     IN p_bairro VARCHAR(255),
     IN p_cidade VARCHAR(150),
@@ -67,7 +67,7 @@ drop procedure sp_inserir_empresa_com_endereco;
 
 DELIMITER ;
 CALL sp_inserir_empresa_com_endereco(
-'VITAL+',
+    'VITAL+',
     'João Silva',
     'joão@gmail.com',
     'joão123',
@@ -107,7 +107,7 @@ JOIN
 
 
 CREATE TABLE tbl_endereco_empresa(
-id_endereco_empresa INT PRIMARY KEY AUTO_INCREMENT,
+    id_endereco_empresa INT PRIMARY KEY AUTO_INCREMENT,
  cep VARCHAR(20),
  logradouro VARCHAR(255),
  bairro VARCHAR(255),
@@ -138,7 +138,7 @@ CREATE TABLE tbl_enderecos (
     logradouro VARCHAR(255),
     complemento VARCHAR(255),
     cidade VARCHAR(150),
-estado VARCHAR(20),
+    estado VARCHAR(20),
     numero VARCHAR(30),
     id_usuario INT,
     CONSTRAINT FK_ENDERECO_USUARIO
@@ -231,6 +231,35 @@ FROM
     tbl_medicos m
 JOIN
     tbl_empresa e ON m.id_empresa = e.id_empresa;
+    
+    
+    CREATE VIEW vw_medico_empresa AS
+SELECT
+    m.id_medico,
+    m.nome AS nome_medico,
+    m.email AS email_medico,
+    m.telefone AS telefone_medico,
+    m.crm,
+    m.data_nascimento AS data_nascimento_medico,
+    e.id_empresa,
+    e.nome_empresa,
+    e.nome_proprietario,
+    e.cnpj,
+    e.email AS email_empresa,
+    e.telefone,
+    e.telefone_clinica,
+    es.nome -- mostra as especialidades
+FROM
+    tbl_medicos m
+JOIN
+    tbl_empresa e ON m.id_empresa = e.id_empresa
+JOIN
+    tbl_medico_especialidade me ON m.id_medico = me.id_medico
+JOIN
+    tbl_especialidades es ON me.id_especialidade = es.id_especialidade;
+
+    
+    
    
     drop view vw_medico_empresa;
    
@@ -257,7 +286,7 @@ BEGIN
 
     -- Inserir o médico na tabela tbl_medicos, associado à última empresa cadastrada
     CALL sp_inserir_medico_ultima_empresa(p_nome, p_email, p_senha, p_telefone, p_crm, p_data_nascimento);
-    
+   
     -- Pegar o ID do médico recém-cadastrado
     SET last_medico_id = LAST_INSERT_ID();
 
@@ -265,7 +294,7 @@ BEGIN
     WHILE LENGTH(p_especialidades) > 0 DO
         -- Pegar a primeira especialidade da lista
         SET especialidade_nome = TRIM(SUBSTRING_INDEX(p_especialidades, ',', 1));
-        
+       
         -- Remover essa especialidade da lista
         SET p_especialidades = TRIM(SUBSTRING(p_especialidades, LENGTH(especialidade_nome) + 2));
 
@@ -297,7 +326,7 @@ CALL sp_inserir_medico_com_especialidades(
     'Dermatologista' -- Especialidades separadas por vírgula
 );
 
-select * from tbl_empresa;
+select * from tbl_especialidades;
 
 
 
@@ -334,18 +363,17 @@ CREATE TABLE tbl_especialidades (
 
 show tables;
 
-insert into tbl_especialidades(nome, descricao, imagem_url)values
-(
-"Dermatologista",
-"Um dermatologista é um médico especializado em doenças e condições da pele, cabelo e unhas.",
-"https://hsmcidadeocidental.com.br/wp-content/uploads/2023/07/dermatologia-procedimento-estetico-rosto.jpg"
+insert into tbl_especialidades(nome, descricao, imagem_url)values(
+    "Cardiologista",
+    "Um cardiologista é um médico que trata doenças do coração e vasos sanguíneos.",
+    "https://vitaclinica.com.br/wp-content/uploads/2019/08/Cardiologista-1-1200x800.jpg"
 );
 
 select * from tbl_medico_especialidade;
 
 -- Tabela intermediária médico-especialidade
 CREATE TABLE tbl_medico_especialidade (
-	id_medico_especialidade INT PRIMARY KEY AUTO_INCREMENT,
+    id_medico_especialidade INT PRIMARY KEY AUTO_INCREMENT,
     id_medico INT,
     id_especialidade INT,
     FOREIGN KEY (id_medico) REFERENCES tbl_medicos(id_medico) ON DELETE CASCADE, -- Exclui especialidades associadas se médico for removido
@@ -383,6 +411,65 @@ CREATE TABLE tbl_videos (
     data_publicacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (id_empresa) REFERENCES tbl_empresa(id_empresa) ON DELETE CASCADE -- Se empresa for excluída, vídeos são excluídos
 );
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_inserir_video_ultima_empresa(
+    IN p_titulo VARCHAR(255),
+    IN p_descricao TEXT,
+    IN p_url VARCHAR(255)
+)
+BEGIN
+    DECLARE last_empresa_id INT;
+
+    -- Obtém o id da última empresa cadastrada
+    SELECT MAX(id_empresa) INTO last_empresa_id FROM tbl_empresa;
+
+    -- Verifica se existe ao menos uma empresa cadastrada
+    IF last_empresa_id IS NOT NULL THEN
+        -- Insere o vídeo associado à última empresa cadastrada
+        INSERT INTO tbl_videos (id_empresa, titulo, descricao, url)
+        VALUES (last_empresa_id, p_titulo, p_descricao, p_url);
+    ELSE
+        -- Se não houver nenhuma empresa cadastrada, gera um erro
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Nenhuma empresa encontrada para associar o vídeo';
+    END IF;
+END$$
+
+DELIMITER ;
+
+
+CALL sp_inserir_video_ultima_empresa(
+    'Exercícios Físicos',
+    'Este vídeo apresenta alguns exercícios físicos.',
+    'https://url_do_video.com/video.mp4'
+);
+
+
+CREATE VIEW vw_videos_empresas AS
+SELECT
+    v.id_video,
+    v.titulo AS titulo_video,
+    v.descricao AS descricao_video,
+    v.url AS url_video,
+    v.data_publicacao,
+    e.id_empresa,
+    e.nome_empresa,
+    e.cnpj,
+    e.email AS email_empresa,
+    e.telefone AS telefone_empresa,
+    e.telefone_clinica
+FROM
+    tbl_videos v
+JOIN
+    tbl_empresa e ON v.id_empresa = e.id_empresa;
+
+
+select * from vw_videos_empresas;
+
+
+
 
 -- Índices para melhorar a performance de buscas frequentes
 CREATE INDEX idx_email_usuario ON tbl_usuarios(email);
@@ -574,5 +661,5 @@ CALL sp_login_usuario(
             'gustavo123'
         );
 
-            
+           
 select * from tbl_usuarios;
