@@ -37,6 +37,29 @@ const insert = async function(dadosEmpresa){
     }
 }
 
+const loginEmpresa = async function(dadosLogin){
+    try {
+        const sql = `CALL sp_login_empresa(
+            '${dadosLogin.cnpj}',
+            '${dadosLogin.senha}'
+        );
+        `
+        console.log(sql)
+       
+        let result = await prisma.$executeRawUnsafe(sql)
+
+
+        if(result){
+           return true
+        }else{
+           return false
+        }
+    } catch (error) {
+        console.log(error)
+        return false
+    }
+}
+
 
 const update = async function(dadosEmpresa, idEmpresa){
     let sql
@@ -136,6 +159,7 @@ const ID = async function(){
 
 module.exports = {
     insert,
+    loginEmpresa,
     update,
     deletar,
     listAll,

@@ -18,6 +18,9 @@ const cors = require('cors')
 
 const app = express()
 
+// Ativa as confgurações de cors
+app.use(cors())
+
 app.use((request, response, next) => {
 
     // Permite especificar quem podera acessar a API ('*' = Liberar acesso público, 'IP' = Liberar acesso apenas para aquela maquina);
@@ -26,13 +29,10 @@ app.use((request, response, next) => {
     // Permite especificar como a API, sera requisitada ('GET', 'POST', 'PUT' e 'DELETE')
     response.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
 
-    // Ativa as confgurações de cors
-    app.use(cors({origin: 'http://127.0.0.1:5500'}))
-
-
+    
+    
     next()
 })
-
 const bodyParserJSON = bodyParser.json()
 
 /*********************** Import dos arquivos de controller do projeto ***********************************/
@@ -147,6 +147,25 @@ const bodyParserJSON = bodyParser.json()
         response.json(resultDadosNovaEmpresa);
    
     })
+
+    app.post('/v1/vital/loginEmpresa', cors(), bodyParserJSON, async function (request, response, next) {
+        try {
+            // Recebe o Content-Type da requisição
+            const contentType = request.headers['content-type'];
+    
+            // Recebe os dados do corpo da requisição
+            const dadosBody = request.body;
+    
+            // Encaminha os dados para a controller
+            const resultDadosNovoUsuario = await controllerEmpresa.setLoginEmpresa(dadosBody, contentType);
+    
+            // Envia a resposta para o cliente
+            response.status(resultDadosNovoUsuario.status_code);
+            response.json(resultDadosNovoUsuario);
+        } catch (error) {
+            next(error);  // Passa o erro para o middleware de tratamento de erros
+        }
+    });
 
     app.get('/v1/vital/empresa', cors(),async function (request,response,next){
 

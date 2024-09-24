@@ -68,6 +68,38 @@ const setInserir = async function(dadosEmpresa, contentType){
         }
 }
 
+const setLoginEmpresa = async function(){
+    try {
+        let JSON = {}
+
+
+   let dadosEmpresa = await empresaDAO.loginEmpresa()
+   {
+    if(dadosEmpresa){
+
+
+        if(dadosEmpresa.length > 0){
+
+            JSON.empresas = dadosEmpresa
+            JSON.quantidade = dadosEmpresa.length
+            JSON.status_code = 200
+            return JSON
+        }else{
+            return message.ERROR_NOT_FOUND
+        }
+    }else{
+        return message.ERROR_INTERNAL_SERVER_DB
+    }
+
+
+    }
+    }
+    catch (error) {
+        console.log(error);
+        return message.ERROR_INTERNAL_SERVER
+}
+}
+
 
 const setAtualizar = async function(id, dadoAtualizado, contentType){
     try{
@@ -250,6 +282,7 @@ const setListarPorId = async function(id){
 
 module.exports = {
     setInserir,
+    setLoginEmpresa,
     setAtualizar,
     setDeletar,
     setListar,

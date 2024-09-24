@@ -146,7 +146,7 @@ estado VARCHAR(20),
     FOREIGN KEY (id_usuario) REFERENCES tbl_usuarios(id_usuario)
 );
 
-
+select * from tbl_enderecos where id_endereco = 2;
 
 -- Tabela de médicos
 CREATE TABLE tbl_medicos (
@@ -704,4 +704,63 @@ CALL sp_login_usuario(
         );
 
            
-select * from tbl_usuarios;
+
+
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_login_empresa(
+    IN p_cnpj VARCHAR(18),
+    IN p_senha VARCHAR(255)
+)
+BEGIN
+    DECLARE cnpj_existente INT;
+    DECLARE senha_valida INT;
+    
+    -- Verificar se o CNPJ existe
+    SELECT COUNT(*) INTO cnpj_existente 
+    FROM tbl_empresa 
+    WHERE cnpj = p_cnpj;
+    
+    -- Se o CNPJ não existir, encerra o procedimento
+    IF cnpj_existente = 0 THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'CNPJ não encontrado';
+    END IF;
+    
+    -- Verificar se a senha está correta para o CNPJ fornecido
+    SELECT COUNT(*) INTO senha_valida 
+    FROM tbl_empresa 
+    WHERE cnpj = p_cnpj AND senha = p_senha;
+    
+    -- Se a senha não for válida, retorna erro
+    IF senha_valida = 0 THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Senha incorreta';
+    ELSE
+        -- Retornar os dados da empresa se o login for bem-sucedido
+        SELECT 
+            e.id_empresa,
+            e.nome_empresa,
+            e.nome_proprietario,
+            e.email,
+            e.cnpj,
+            e.telefone,
+            e.telefone_clinica,
+            end.cep,
+            end.logradouro,
+            end.bairro,
+            end.cidade,
+            end.estado
+        FROM tbl_empresa e
+        JOIN tbl_endereco_empresa end ON e.id_empresa = end.id_empresa
+        WHERE e.cnpj = p_cnpj;
+    END IF;
+    
+END$$
+
+DELIMITER ;
+
+CALL sp_login_empresa('12345678910', 'Vini123');
+
+select * from tbl_empresa;
