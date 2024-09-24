@@ -1,7 +1,7 @@
 CREATE DATABASE db_vital;
 USE db_vital;
 
-drop database db_vital;
+ drop database db_vital;
 
 -- Tabela de sexos
 CREATE TABLE tbl_sexo (
@@ -9,13 +9,15 @@ CREATE TABLE tbl_sexo (
     descricao VARCHAR(20) NOT NULL UNIQUE
 );
 
+select * from tbl_sexo where descricao = 'Feminino';
+
 select * from tbl_sexo where id_sexo = 1;
 
 -- Inserir sexos padrão
 INSERT INTO tbl_sexo (descricao) VALUES ('Masculino');
 INSERT INTO tbl_sexo (descricao) VALUES ('Feminino');
 
-drop table tbl_empresa;
+
 
 -- Tabela de empresas
 CREATE TABLE tbl_empresa (
@@ -29,19 +31,18 @@ CREATE TABLE tbl_empresa (
     telefone_clinica VARCHAR(30) NOT NULL
 );
 
-drop procedure sp_inserir_empresa_com_endereco;
 
 DELIMITER $$
 
 CREATE PROCEDURE sp_inserir_empresa_com_endereco(
-    IN p_nome_empresa VARCHAR(255),
+IN p_nome_empresa VARCHAR(255),
     IN p_nome_proprietario VARCHAR(255),
     IN p_email VARCHAR(320),
     IN p_senha VARCHAR(15),
     IN p_cnpj VARCHAR(255),
     IN p_telefone VARCHAR(20),
     IN p_telefone_clinica VARCHAR(255),
-    IN p_cep VARCHAR(20),
+IN p_cep VARCHAR(20),
     IN p_logradouro VARCHAR(255),
     IN p_bairro VARCHAR(255),
     IN p_cidade VARCHAR(150),
@@ -63,11 +64,11 @@ BEGIN
     VALUES (p_cep, p_logradouro, p_bairro, p_cidade, p_estado, last_user_id);
 END$$
 
-drop procedure sp_inserir_empresa_com_endereco;
+
 
 DELIMITER ;
 CALL sp_inserir_empresa_com_endereco(
-    'VITAL+',
+'VITAL+',
     'João Silva',
     'joão@gmail.com',
     'joão123',
@@ -107,7 +108,7 @@ JOIN
 
 
 CREATE TABLE tbl_endereco_empresa(
-    id_endereco_empresa INT PRIMARY KEY AUTO_INCREMENT,
+id_endereco_empresa INT PRIMARY KEY AUTO_INCREMENT,
  cep VARCHAR(20),
  logradouro VARCHAR(255),
  bairro VARCHAR(255),
@@ -138,14 +139,14 @@ CREATE TABLE tbl_enderecos (
     logradouro VARCHAR(255),
     complemento VARCHAR(255),
     cidade VARCHAR(150),
-    estado VARCHAR(20),
+estado VARCHAR(20),
     numero VARCHAR(30),
     id_usuario INT,
     CONSTRAINT FK_ENDERECO_USUARIO
     FOREIGN KEY (id_usuario) REFERENCES tbl_usuarios(id_usuario)
 );
 
-drop database db_vital;
+
 
 -- Tabela de médicos
 CREATE TABLE tbl_medicos (
@@ -261,7 +262,7 @@ JOIN
     
     
    
-    drop view vw_medico_empresa;
+ 
    
     select * from vw_medico_empresa;
    
@@ -331,7 +332,6 @@ select * from tbl_especialidades;
 
 
 
-drop procedure sp_inserir_medico_com_especialidades;
 
 
 
@@ -363,17 +363,18 @@ CREATE TABLE tbl_especialidades (
 
 show tables;
 
-insert into tbl_especialidades(nome, descricao, imagem_url)values(
-    "Cardiologista",
-    "Um cardiologista é um médico que trata doenças do coração e vasos sanguíneos.",
-    "https://vitaclinica.com.br/wp-content/uploads/2019/08/Cardiologista-1-1200x800.jpg"
+insert into tbl_especialidades(nome, descricao, imagem_url)values
+(
+"Cardiologista",
+"Um cardiologista é um médico que trata doenças do coração e vasos sanguíneos.",
+"https://vitaclinica.com.br/wp-content/uploads/2019/08/Cardiologista-1-1200x800.jpg"
 );
 
 select * from tbl_medico_especialidade;
 
 -- Tabela intermediária médico-especialidade
 CREATE TABLE tbl_medico_especialidade (
-    id_medico_especialidade INT PRIMARY KEY AUTO_INCREMENT,
+id_medico_especialidade INT PRIMARY KEY AUTO_INCREMENT,
     id_medico INT,
     id_especialidade INT,
     FOREIGN KEY (id_medico) REFERENCES tbl_medicos(id_medico) ON DELETE CASCADE, -- Exclui especialidades associadas se médico for removido
@@ -388,6 +389,50 @@ CREATE TABLE tbl_empresa_especialidade (
     FOREIGN KEY (id_empresa) REFERENCES tbl_empresa(id_empresa) ON DELETE CASCADE, -- Exclui especialidades associadas se empresa for removida
     FOREIGN KEY (id_especialidade) REFERENCES tbl_especialidades(id_especialidade) ON DELETE CASCADE -- Exclui associações se especialidade for removida
 );
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_inserir_especialidade_com_empresa(
+    IN p_nome_especialidade VARCHAR(255),
+    IN p_descricao_especialidade TEXT,
+    IN p_imagem_url VARCHAR(255)
+)
+BEGIN
+    DECLARE last_empresa_id INT;
+
+    -- Inserir a especialidade na tabela tbl_especialidades
+    INSERT INTO tbl_especialidades (nome, descricao, imagem_url)
+    VALUES (p_nome_especialidade, p_descricao_especialidade, p_imagem_url);
+
+    -- Pegar o ID da última empresa cadastrada
+    SELECT MAX(id_empresa) INTO last_empresa_id FROM tbl_empresa;
+
+    -- Verificar se existe pelo menos uma empresa cadastrada
+    IF last_empresa_id IS NOT NULL THEN
+        -- Pegar o ID da última especialidade inserida
+        SET @last_especialidade_id = LAST_INSERT_ID();
+
+        -- Associar a especialidade à última empresa
+        INSERT INTO tbl_empresa_especialidade (id_empresa, id_especialidade)
+        VALUES (last_empresa_id, @last_especialidade_id);
+    ELSE
+        -- Se não houver empresas cadastradas, lança um erro
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Nenhuma empresa encontrada para associar a especialidade';
+    END IF;
+END$$
+
+DELIMITER ;
+
+CALL sp_inserir_especialidade_com_empresa(
+    'Ortopedista',
+    'Especialista em problemas ósseos e musculares.',
+    'https://link_da_imagem.com/ortopedista.jpg'
+);
+select * from tbl_empresa_especialidade;
+
+
+
 
 -- Tabela de avaliações
 CREATE TABLE tbl_avaliacoes (
@@ -475,7 +520,6 @@ select * from vw_videos_empresas;
 CREATE INDEX idx_email_usuario ON tbl_usuarios(email);
 CREATE INDEX idx_crm_medico ON tbl_medicos(crm);
 
-drop procedure sp_inserir_usuario_com_endereco;
 
 DELIMITER $$
 
@@ -567,7 +611,6 @@ END$$
 
 DELIMITER ;
 
-drop trigger trg_delete_usuario_endereco;
 
 
 -- Deletar um usuário (e automaticamente seu endereço será deletado)
@@ -602,7 +645,6 @@ JOIN
    
 
 
-drop procedure sp_login_usuario;
 
 
 DELIMITER $$
