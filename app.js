@@ -18,7 +18,7 @@ const cors = require('cors')
 
 const app = express()
 
-app.use((request, response, next) =>{
+app.use((request, response, next) => {
 
     // Permite especificar quem podera acessar a API ('*' = Liberar acesso público, 'IP' = Liberar acesso apenas para aquela maquina);
     response.header('Access-Control-Allow-Origin', '*')
@@ -27,7 +27,7 @@ app.use((request, response, next) =>{
     response.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
 
     // Ativa as confgurações de cors
-    app.use(cors())
+    app.use(cors({origin: 'http://127.0.0.1:5500'}))
 
 
     next()

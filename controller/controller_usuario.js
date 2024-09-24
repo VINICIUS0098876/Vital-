@@ -227,10 +227,13 @@ const setListarUsuario = async function(){
 
         if(dadosUsuario.length> 0){
 
-            //for(let usuario of dadosUsuario){
-            //   let sexoUsuario = await sexoDAO.selectByIdSexo(usuario.descricao)
+            // for(let usuario of dadosUsuario){
+            //   let sexoUsuario = await sexoDAO.selectByIdSexo(usuario.id_sexo)
+            // //   let enderecoUsuario = await enderecoUsuarioDAO.selectByIdEnderecoUsuario(usuario.id_endereco)
+            //   delete usuario.id_sexo
             //    usuario.sexo = sexoUsuario
-            //}
+            // //    usuario.endereco = enderecoUsuario
+            // }
 
             usuarioJSON.usuarios = dadosUsuario
             usuarioJSON.quantidade = dadosUsuario.length
