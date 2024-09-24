@@ -3,8 +3,28 @@ const { PrismaClient } = require('@prisma/client')
 // Instacia da classe PrismaClient
 const prisma = new PrismaClient()
 
-const inserir= async function(){
-    
+const inserir= async function(dadosEspecialidade){
+    try {
+        const sql = `CALL sp_inserir_especialidade_com_empresa(
+            '${dadosEspecialidade.nome}',
+            '${dadosEspecialidade.descricao}',
+            '${dadosEspecialidade.imagem_url}'
+        );
+        `
+        console.log(sql)
+       
+        let result = await prisma.$executeRawUnsafe(sql)
+
+
+        if(result){
+           return true
+        }else{
+           return false
+        }
+    } catch (error) {
+        console.log(error)
+        return false
+    }
 }
 
 const update = async function(dados, id){

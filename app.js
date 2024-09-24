@@ -269,6 +269,23 @@ const bodyParserJSON = bodyParser.json()
     })
 
     /*********************** ESPECIALIDADES ***********************************/
+    app.post('/v1/vital/especialidade', cors(), bodyParserJSON, async function (request, response,next ){
+
+
+        // recebe o ContentType com os tipos de dados encaminhados na requisição
+        let contentType = request.headers['content-type'];
+   
+        // vou receber o que chegar no corpo da requisição e guardar nessa variável local
+        let dadosBody = request.body;
+        // encaminha os dados para a controller enviar para o DAO
+        let resultDadosNovaEspecialidade = await controllerEspecialidade.setInserir(dadosBody, contentType)
+   
+   
+        response.status(resultDadosNovaEspecialidade.status_code);
+        response.json(resultDadosNovaEspecialidade);
+   
+    })
+
     app.get('/v1/vital/especialidade', cors(),async function (request,response,next){
 
 

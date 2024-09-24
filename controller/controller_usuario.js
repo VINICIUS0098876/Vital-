@@ -219,15 +219,18 @@ const setListarUsuario = async function(){
         let usuarioJSON = {}
 
    let dadosUsuario= await usuarioDAO.selectAllUsuario()
+
+
+   
    {
     if(dadosUsuario){
 
         if(dadosUsuario.length> 0){
 
-            // for(let usuario of dadosUsuario){
-            //     let sexoUsuario = await sexoDAO.selectByIdSexo(usuario.id_sexo)
-            //     usuario.sexo = sexoUsuario
-            // }
+            //for(let usuario of dadosUsuario){
+            //   let sexoUsuario = await sexoDAO.selectByIdSexo(usuario.descricao)
+            //    usuario.sexo = sexoUsuario
+            //}
 
             usuarioJSON.usuarios = dadosUsuario
             usuarioJSON.quantidade = dadosUsuario.length
