@@ -68,36 +68,47 @@ const setInserir = async function(dadosEmpresa, contentType){
         }
 }
 
-const setLoginEmpresa = async function(){
+const setLoginEmpresa = async function(dados){
     try {
-        let JSON = {}
+        // Recebe o id do filme
+     
+    let dadosLogin = dados
+
+    //Cria o objeto JSON
+    let JSON = {}
 
 
-   let dadosEmpresa = await empresaDAO.loginEmpresa()
-   {
-    if(dadosEmpresa){
-
-
-        if(dadosEmpresa.length > 0){
-
-            JSON.empresas = dadosEmpresa
-            JSON.quantidade = dadosEmpresa.length
-            JSON.status_code = 200
-            return JSON
-        }else{
-            return message.ERROR_NOT_FOUND
-        }
+    //Validação para verificar se o id é válido(Vazio, indefinido e não numérico)
+    if(dadosLogin == '' || dadosLogin == undefined || isNaN(dadosLogin)){
+        return message.ERROR_INVALID_ID // 400
     }else{
-        return message.ERROR_INTERNAL_SERVER_DB
-    }
 
+        //Encaminha para o DAO localizar o id do filme 
+        let dadosEmpresa = await empresaDAO.loginEmpresa(dadosLogin)
 
+        // Validação para verificar se existem dados de retorno
+        if(dadosEmpresa){
+
+            // Validação para verificar a quantidade de itens encontrados.
+            if(dadosEmpresa.length > 0){
+                //Criar o JSON de retorno
+                JSON.empresa = dadosEmpresa
+                JSON.status_code = 200
+    
+                
+                return JSON
+            }else{
+                return message.ERROR_NOT_FOUND // 404
+            }
+
+        }else{
+            return message.ERROR_INTERNAL_SERVER_DB // 500
+        }
     }
-    }
-    catch (error) {
-        console.log(error);
-        return message.ERROR_INTERNAL_SERVER
-}
+   } catch (error) {
+       console.log(error)
+       return message.ERROR_INTERNAL_SERVER_DB
+   }
 }
 
 

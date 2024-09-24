@@ -763,4 +763,22 @@ DELIMITER ;
 
 CALL sp_login_empresa('12345678910', 'Vini123');
 
+SELECT 
+    e.id_empresa,
+    e.nome_empresa,
+    e.nome_proprietario,
+    e.email,
+    e.cnpj,
+    e.telefone,
+    e.telefone_clinica,
+    end.cep,
+    end.logradouro,
+    end.bairro,
+    end.cidade,
+    end.estado
+FROM tbl_empresa e
+JOIN tbl_endereco_empresa end ON e.id_empresa = end.id_empresa
+WHERE e.cnpj = '12345678910' AND e.senha = 'Vini123';
+
+
 select * from tbl_empresa;

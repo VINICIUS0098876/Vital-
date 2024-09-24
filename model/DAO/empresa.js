@@ -39,14 +39,26 @@ const insert = async function(dadosEmpresa){
 
 const loginEmpresa = async function(dadosLogin){
     try {
-        const sql = `CALL sp_login_empresa(
-            '${dadosLogin.cnpj}',
-            '${dadosLogin.senha}'
-        );
-        `
+        const sql = `SELECT 
+        e.id_empresa,
+        e.nome_empresa,
+        e.nome_proprietario,
+        e.email,
+        e.cnpj,
+        e.telefone,
+        e.telefone_clinica,
+        end.cep,
+        end.logradouro,
+        end.bairro,
+        end.cidade,
+        end.estado
+    FROM tbl_empresa e
+    JOIN tbl_endereco_empresa end ON e.id_empresa = end.id_empresa
+    WHERE e.cnpj = ${dadosLogin} AND e.senha = ${dadosLogin};`
         console.log(sql)
        
-        let result = await prisma.$executeRawUnsafe(sql)
+        let result = await prisma.$queryRawUnsafe(sql)
+        console.log(result);
 
 
         if(result){
