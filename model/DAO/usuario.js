@@ -15,21 +15,12 @@ const prisma = new PrismaClient()
 
 const insertUsuario = async function(dadosUsuario){
     try {
-        const sql = `CALL sp_inserir_usuario_com_endereco(
-            '${dadosUsuario.nome}',
-            '${dadosUsuario.email}',
-            '${dadosUsuario.cpf}',
-            '${dadosUsuario.id_sexo}',
-            '${dadosUsuario.senha}',
-            '${dadosUsuario.data_nascimento}',
-            '${dadosUsuario.cep}',
-            '${dadosUsuario.logradouro}',
-            '${dadosUsuario.complemento}',
-            '${dadosUsuario.cidade}',
-            '${dadosUsuario.estado}',
-            '${dadosUsuario.numero}'
-        );
-        `
+        const sql = `insert into tbl_usuarios(nome, email, cpf, id_sexo, senha, data_nascimento)values('${dadosUsuario.nome}',
+        '${dadosUsuario.email}',
+        '${dadosUsuario.cpf}',
+        '${dadosUsuario.id_sexo}',
+        '${dadosUsuario.senha}',
+        '${dadosUsuario.data_nascimento}')`
         console.log(sql)
         
         let result = await prisma.$executeRawUnsafe(sql)
@@ -45,28 +36,20 @@ const insertUsuario = async function(dadosUsuario){
     }
 }
 
-const loginUsuario = async function(dadosUsuario) {
+const loginUsuario = async function(email, senha) {
     try {
-        // Montar a chamada para a stored procedure
-        const sql = `CALL sp_login_usuario('${dadosUsuario.email}', '${dadosUsuario.senha}')`;
+        const sql = `select id_usuario, nome from tbl_usuarios where email = '${email}' and senha = '${senha}';
+`
+        console.log(sql)
+       
+        let result = await prisma.$queryRawUnsafe(sql)
+        console.log(result);
 
-        // Executar a stored procedure e capturar o resultado
-        const result = await prisma.$queryRawUnsafe(sql);
+       return result
 
-        console.log('SQL Executado:', sql);
-        console.log('Resultado da Query:', result);
-
-        // Verificar se a stored procedure retornou algum resultado
-        if (result && result.length > 0) {
-            // Extrair o ID do usuário do primeiro resultado
-            const idUsuario = result[0]['f0']; // Usar 'f0' conforme o resultado retornado
-            return idUsuario;  // Retornar o ID do usuário
-        } else {
-            return false;  // Retornar falso se nenhum usuário foi encontrado
-        }
     } catch (error) {
-        console.log('Erro ao executar a stored procedure:', error);
-        return false;  // Retornar falso em caso de erro
+        console.log(error)
+        return false
     }
 }
 

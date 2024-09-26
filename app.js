@@ -69,7 +69,7 @@ const bodyParserJSON = bodyParser.json()
             const dadosBody = request.body;
     
             // Encaminha os dados para a controller
-            const resultDadosNovoUsuario = await controllerUsuario.setLoginUsuario(dadosBody, contentType);
+            const resultDadosNovoUsuario = await controllerUsuario.setLoginUsuario(dadosBody.email, dadosBody.senha);
     
             // Envia a resposta para o cliente
             response.status(resultDadosNovoUsuario.status_code);
@@ -157,7 +157,7 @@ const bodyParserJSON = bodyParser.json()
             const dadosBody = request.body;
     
             // Encaminha os dados para a controller
-            const resultDadosNovoUsuario = await controllerEmpresa.setLoginEmpresa(dadosBody, contentType);
+            const resultDadosNovoUsuario = await controllerEmpresa.setLoginEmpresa(dadosBody.cnpj, dadosBody.senha);
     
             // Envia a resposta para o cliente
             response.status(resultDadosNovoUsuario.status_code);
@@ -236,6 +236,25 @@ const bodyParserJSON = bodyParser.json()
    
     })
 
+    app.post('/v1/vital/loginMedico', cors(), bodyParserJSON, async function (request, response, next) {
+        try {
+            // Recebe o Content-Type da requisição
+            const contentType = request.headers['content-type'];
+    
+            // Recebe os dados do corpo da requisição
+            const dadosBody = request.body;
+    
+            // Encaminha os dados para a controller
+            const resultDadosNovoUsuario = await controllerMedico.setLoginMedico(dadosBody.crm, dadosBody.senha);
+    
+            // Envia a resposta para o cliente
+            response.status(resultDadosNovoUsuario.status_code);
+            response.json(resultDadosNovoUsuario);
+        } catch (error) {
+            next(error);  // Passa o erro para o middleware de tratamento de erros
+        }
+    });
+
     app.get('/v1/vital/medico', cors(),async function (request,response,next){
 
 
@@ -251,6 +270,14 @@ const bodyParserJSON = bodyParser.json()
             response.status(404);
         }
     });
+
+    app.get('/v1/vital/filtroMedico/filtro', cors(), async function(request, response, next){
+        let crm = request.query.crm
+        let dadosMedico = await controllerMedico.setFiltrar(crm)
+
+        response.status(dadosMedico.status_code)
+        response.json(dadosMedico)
+    })
 
     app.get('/v1/vital/medico/:id', cors(), async function(request,response,next){
 
@@ -331,6 +358,14 @@ const bodyParserJSON = bodyParser.json()
     
         response.status(dadosEspecialidade.status_code);
         response.json(dadosEspecialidade);
+    })
+
+    app.get('/v1/vital/filtroEspecialidade/filtro', cors(), async function(request, response, next){
+        let nome = request.query.nome
+        let dadosEspecialidade = await controllerEspecialidade.setFiltrar(nome)
+
+        response.status(dadosEspecialidade.status_code)
+        response.json(dadosEspecialidade)
     })
 
     app.delete('/v1/vital/especialidade/:id', cors (), async function (request,response,next){

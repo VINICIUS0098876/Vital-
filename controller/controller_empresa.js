@@ -68,47 +68,27 @@ const setInserir = async function(dadosEmpresa, contentType){
         }
 }
 
-const setLoginEmpresa = async function(dados){
+const setLoginEmpresa = async function(cnpj, senha){
     try {
-        // Recebe o id do filme
-     
-    let dadosLogin = dados
+        let JSON = {};
+        let dadosEmpresa = await empresaDAO.loginEmpresa(cnpj, senha);
 
-    //Cria o objeto JSON
-    let JSON = {}
-
-
-    //Validação para verificar se o id é válido(Vazio, indefinido e não numérico)
-    if(dadosLogin == '' || dadosLogin == undefined || isNaN(dadosLogin)){
-        return message.ERROR_INVALID_ID // 400
-    }else{
-
-        //Encaminha para o DAO localizar o id do filme 
-        let dadosEmpresa = await empresaDAO.loginEmpresa(dadosLogin)
-
-        // Validação para verificar se existem dados de retorno
-        if(dadosEmpresa){
-
-            // Validação para verificar a quantidade de itens encontrados.
-            if(dadosEmpresa.length > 0){
-                //Criar o JSON de retorno
-                JSON.empresa = dadosEmpresa
-                JSON.status_code = 200
-    
-                
-                return JSON
-            }else{
-                return message.ERROR_NOT_FOUND // 404
-            }
-
-        }else{
-            return message.ERROR_INTERNAL_SERVER_DB // 500
+        if (dadosEmpresa.length === 0) {
+            return { status_code: 400, message: 'Empresa não encontrada ou senha incorreta' };
         }
+
+        console.log(cnpj);
+        
+        // Se tudo estiver correto, retorna a Empresa e uma mensagem de sucesso
+        JSON.id = dadosEmpresa[0].id_empresa;
+        JSON.empresa = dadosEmpresa[0].nome_empresa
+        JSON.status_code = message.SUCCESS_LOGIN_ITEM.status_code;
+        JSON.message = message.SUCCESS_LOGIN_ITEM;
+        return JSON;
+    } catch (error) {
+        console.log(error);
+        return message.ERROR_INTERNAL_SERVER;
     }
-   } catch (error) {
-       console.log(error)
-       return message.ERROR_INTERNAL_SERVER_DB
-   }
 }
 
 

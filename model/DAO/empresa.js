@@ -37,35 +37,17 @@ const insert = async function(dadosEmpresa){
     }
 }
 
-const loginEmpresa = async function(dadosLogin){
+const loginEmpresa = async function(cnpj, senha){
     try {
-        const sql = `SELECT 
-        e.id_empresa,
-        e.nome_empresa,
-        e.nome_proprietario,
-        e.email,
-        e.cnpj,
-        e.telefone,
-        e.telefone_clinica,
-        end.cep,
-        end.logradouro,
-        end.bairro,
-        end.cidade,
-        end.estado
-    FROM tbl_empresa e
-    JOIN tbl_endereco_empresa end ON e.id_empresa = end.id_empresa
-    WHERE e.cnpj = ${dadosLogin} AND e.senha = ${dadosLogin};`
+        const sql = `select id_empresa, nome_empresa from tbl_empresa where cnpj = ${cnpj} and senha = '${senha}';
+`
         console.log(sql)
        
         let result = await prisma.$queryRawUnsafe(sql)
         console.log(result);
 
+       return result
 
-        if(result){
-           return true
-        }else{
-           return false
-        }
     } catch (error) {
         console.log(error)
         return false

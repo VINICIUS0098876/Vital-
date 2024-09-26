@@ -218,10 +218,62 @@ const setDeletar = async function(id){
     }
 }
 
+const setFiltrar = async function(nome){
+    try {
+        
+
+        // Recebe o nome da especialidade
+        let nomeEspecialidade = nome
+
+        console.log(nome);
+        
+        
+
+    //Cria o objeto JSON
+    let especialidadeJSON = {}
+
+    
+    
+    //Validação para verificar se o id é válido(Vazio, indefinido e não numérico)
+    if(nomeEspecialidade == '' || nomeEspecialidade == undefined){
+        return message.ERROR_INVALID_ID // 400
+    }else{
+        
+        //Encaminha para o DAO localizar o id do filme 
+        let dadosEspecialidade = await especialidadeDAO.filter(nome)
+        
+        
+        // Validação para verificar se existem dados de retorno
+        if(dadosEspecialidade){
+
+            // Validação para verificar a quantidade de itens encontrados.
+            if(dadosEspecialidade.length > 0){
+                //Criar o JSON de retorno
+                especialidadeJSON.especialidade = dadosEspecialidade
+                especialidadeJSON.quantidade = dadosEspecialidade.length
+                especialidadeJSON.status_code = 200
+    
+                
+                return especialidadeJSON
+            }else{
+                return message.ERROR_NOT_FOUND // 404
+            }
+
+        }else{
+            return message.ERROR_INTERNAL_SERVER_DB // 500
+        }
+    }
+   } catch (error) {
+       console.log(error)
+       return message.ERROR_INTERNAL_SERVER_DB
+   }
+}
+
 module.exports = {
     setInserir,
     setAtualizar,
     setListar,
     setListarPorId,
-    setDeletar
+    setDeletar,
+    setFiltrar
 }

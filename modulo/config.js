@@ -28,6 +28,8 @@ const SUCCESS_DELETED_ITEM = {status: true, status_code: 200, message: 'Item exc
 
 const SUCCESS_UPDATED_ITEM = {status: true, status_code: 200, message: 'Item Atualizado com sucesso!!'}
 
+const SUCCESS_LOGIN_ITEM = {status: true, status_code: 200, message: 'Login bem-sucedido!!'}
+
 
 
 
@@ -44,5 +46,6 @@ SUCCESS_CREATED_ITEM,
 ERROR_CONTENT_TYPE,
 ERROR_INTERNAL_SERVER,
 SUCCESS_DELETED_ITEM,
-SUCCESS_UPDATED_ITEM
+SUCCESS_UPDATED_ITEM,
+SUCCESS_LOGIN_ITEM
 }

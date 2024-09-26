@@ -32,6 +32,23 @@ const insert = async function(dadosMedico){
     }
 }
 
+const loginMedico = async function(crm, senha){
+    try {
+        const sql = `select id_medico, nome from tbl_medicos where crm = '${crm}' and senha = '${senha}';
+`
+        console.log(sql)
+       
+        let result = await prisma.$queryRawUnsafe(sql)
+        console.log(result);
+
+       return result
+
+    } catch (error) {
+        console.log(error)
+        return false
+    }
+}
+
 const update = async function(dadosMedico, idMedico){
     let sql
     try {
@@ -119,11 +136,24 @@ const ID = async function(){
     }
 }
 
+const filter = async function(crm){
+    try {
+        let sql = `select * from tbl_medicos where crm like "%${crm}%"`        
+        let rsFilter = await prisma.$queryRawUnsafe(sql)
+        return rsFilter
+    } catch (error) {
+        console.log(error)
+        return false
+    }
+}
+
 module.exports = {
     insert,
     update,
     deletar,
     listAll,
     listById,
-    ID
+    ID,
+    loginMedico,
+    filter
 }
