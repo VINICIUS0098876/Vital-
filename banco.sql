@@ -31,6 +31,10 @@ CREATE TABLE tbl_empresa (
     telefone_clinica VARCHAR(30) NOT NULL
 );
 
+select * from tbl_empresa;
+
+select id_empresa from tbl_empresa where cnpj = 12345678910 and senha = 'Vini123';
+
 
 DELIMITER $$
 
@@ -132,19 +136,8 @@ CREATE TABLE tbl_usuarios (
     FOREIGN KEY (id_sexo) REFERENCES tbl_sexo(id_sexo)
 );
 
--- Tabela de Endereços
-CREATE TABLE tbl_enderecos (
-    id_endereco INT PRIMARY KEY AUTO_INCREMENT,
-    cep VARCHAR(20),
-    logradouro VARCHAR(255),
-    complemento VARCHAR(255),
-    cidade VARCHAR(150),
-estado VARCHAR(20),
-    numero VARCHAR(30),
-    id_usuario INT,
-    CONSTRAINT FK_ENDERECO_USUARIO
-    FOREIGN KEY (id_usuario) REFERENCES tbl_usuarios(id_usuario)
-);
+
+drop table tbl_enderecos;
 
 select * from tbl_enderecos where id_endereco = 2;
 
@@ -233,6 +226,7 @@ FROM
 JOIN
     tbl_empresa e ON m.id_empresa = e.id_empresa;
     
+    drop view vw_medico_empresa;
     
     CREATE VIEW vw_medico_empresa AS
 SELECT
@@ -360,6 +354,10 @@ CREATE TABLE tbl_especialidades (
     descricao TEXT NOT NULL,         -- Descrição da especialidade
     imagem_url VARCHAR(255) NOT NULL -- URL da imagem armazenada no Firebase
 );
+
+select * from tbl_especialidades;
+
+select * from tbl_especialidades where nome like "%Ort%";
 
 show tables;
 
@@ -521,39 +519,9 @@ CREATE INDEX idx_email_usuario ON tbl_usuarios(email);
 CREATE INDEX idx_crm_medico ON tbl_medicos(crm);
 
 
-DELIMITER $$
 
-CREATE PROCEDURE sp_inserir_usuario_com_endereco(
-    IN p_nome VARCHAR(255),
-    IN p_email VARCHAR(320),
-    IN p_cpf VARCHAR(15),
-    IN p_id_sexo INT,
-    IN p_senha VARCHAR(255),
-    IN p_data_nascimento DATE,
-    IN p_cep VARCHAR(20),
-    IN p_logradouro VARCHAR(255),
-    IN p_complemento VARCHAR(255),
-    IN p_cidade VARCHAR(150),
-    IN p_estado VARCHAR(20),
-    IN p_numero VARCHAR(30)
-)
-BEGIN
-    -- A declaração de variáveis deve vir logo após o BEGIN
-    DECLARE last_user_id INT;
 
-    -- Inserindo o usuário
-    INSERT INTO tbl_usuarios (nome, email, cpf, id_sexo, senha, data_nascimento)
-    VALUES (p_nome, p_email, p_cpf, p_id_sexo, p_senha, p_data_nascimento);
-   
-    -- Obtendo o ID do usuário recém-inserido
-    SET last_user_id = LAST_INSERT_ID();
-   
-    -- Inserindo o endereço do usuário
-    INSERT INTO tbl_enderecos (cep, logradouro, complemento, cidade, estado, numero, id_usuario)
-    VALUES (p_cep, p_logradouro, p_complemento, p_cidade, p_estado, p_numero, last_user_id);
-END$$
 
-DELIMITER ;
 
 CREATE VIEW vw_usuarios_enderecos AS
 SELECT
@@ -563,40 +531,13 @@ SELECT
     u.senha,
     u.cpf,
     s.descricao AS sexo,
-    u.data_nascimento,
-    e.cep,
-    e.logradouro,
-    e.complemento,
-    e.cidade,
-    e.estado,
-    e.numero
+    u.data_nascimento
 FROM
     tbl_usuarios u
 JOIN
-    tbl_enderecos e ON u.id_usuario = e.id_usuario
-JOIN
     tbl_sexo s ON u.id_sexo = s.id_sexo;
    
-    drop view vw_usuarios_enderecos;
-
--- Teste da procedure
-CALL sp_inserir_usuario_com_endereco(
-    'João Silva',
-    'joao.silva@email.com',
-    '123.456.789-09',
-    1,  -- ID para 'Masculino'
-    'senhaSegura123',
-    '1985-08-15',
-    '01001-000',
-    'Rua Exemplo',
-    'Apt 101',
-    'São Paulo',
-    '123'
-);
-
--- Verificar dados
-SELECT * FROM vw_usuarios_enderecos;
-
+   
 
 DELIMITER $$
 
@@ -621,164 +562,69 @@ SELECT * FROM tbl_usuarios;
 
 
 
-CREATE VIEW vw_informacoes_usuario AS
-SELECT
-    u.id_usuario,
-    u.nome,
-    u.email,
-    u.cpf,
-    s.descricao AS sexo,
-    u.data_nascimento,
-    e.cep,
-    e.logradouro,
-    e.complemento,
-    e.cidade,
-    e.numero
-FROM
-    tbl_usuarios u
-JOIN
-    tbl_enderecos e ON u.id_usuario = e.id_usuario
-JOIN
-    tbl_sexo s ON u.id_sexo = s.id_sexo;
-   
-   
-   
 
 
 
 
-DELIMITER $$
 
-CREATE PROCEDURE sp_login_usuario (
-    IN p_email VARCHAR(320),
-    IN p_senha VARCHAR(255)
-)
-BEGIN
-    DECLARE v_senha_armazenada VARCHAR(255);
-   
-    -- Buscar a senha armazenada do usuário com base no e-mail
-    SELECT senha INTO v_senha_armazenada
-    FROM tbl_usuarios
-    WHERE email = p_email
-    LIMIT 1;
-   
-    -- Verificar se a senha fornecida corresponde à senha armazenada
-    IF v_senha_armazenada IS NOT NULL AND v_senha_armazenada = p_senha THEN
-        -- Se as senhas coincidirem, buscar as informações do usuário e do endereço
-        SELECT
-            u.id_usuario,
-            u.nome,
-            u.email,
-            u.cpf,
-            s.descricao AS sexo,
-            u.data_nascimento,
-            e.cep,
-            e.logradouro,
-            e.complemento,
-            e.cidade,
-            e.numero
-        FROM
-            tbl_usuarios u
-        JOIN
-            tbl_enderecos e ON u.id_usuario = e.id_usuario
-        JOIN
-            tbl_sexo s ON u.id_sexo = s.id_sexo
-        WHERE
-            u.email = p_email;
-    ELSE
-        -- Caso a senha não coincida
-        SELECT 'Senha incorreta' AS erro;
-    END IF;
-END$$
-
-DELIMITER ;
-
-
-
-
-select * from tbl_usuarios;
-
-CALL sp_login_usuario(
-            'ribeiro@gmail.com',
-            'gustavo123'
-        );
 
            
 
 
 
+
+
+
+
+
+
+CREATE VIEW vw_empresa_completa AS
+SELECT
+    e.id_empresa,
+    e.nome_empresa,
+    e.nome_proprietario,
+    e.cnpj,
+    e.email AS email_empresa,
+    e.telefone AS telefone_empresa,
+    e.telefone_clinica,
+    med.id_medico,
+    med.nome AS nome_medico,
+    med.email AS email_medico,
+    med.crm,
+    med.telefone AS telefone_medico,
+    med.data_nascimento AS data_nascimento_medico,
+    esp.nome AS especialidade,
+    esp.descricao AS descricao_especialidade,
+    esp.imagem_url AS url_imagem_especialidade,
+    ende.cep,
+    ende.logradouro,
+    ende.bairro,
+    ende.cidade,
+    ende.estado
+FROM
+    tbl_empresa e
+LEFT JOIN
+    tbl_endereco_empresa ende ON e.id_empresa = ende.id_empresa
+LEFT JOIN
+    tbl_medicos med ON e.id_empresa = med.id_empresa
+LEFT JOIN
+    tbl_medico_especialidade me ON med.id_medico = me.id_medico
+LEFT JOIN
+    tbl_especialidades esp ON me.id_especialidade = esp.id_especialidade;
+
+select * from vw_empresa_completa;
+
 DELIMITER $$
 
-CREATE PROCEDURE sp_login_empresa(
-    IN p_cnpj VARCHAR(18),
-    IN p_senha VARCHAR(255)
-)
+CREATE TRIGGER trg_delete_empresa_endereco
+BEFORE DELETE ON tbl_empresa
+FOR EACH ROW
 BEGIN
-    DECLARE cnpj_existente INT;
-    DECLARE senha_valida INT;
-    
-    -- Verificar se o CNPJ existe
-    SELECT COUNT(*) INTO cnpj_existente 
-    FROM tbl_empresa 
-    WHERE cnpj = p_cnpj;
-    
-    -- Se o CNPJ não existir, encerra o procedimento
-    IF cnpj_existente = 0 THEN
-        SIGNAL SQLSTATE '45000' 
-        SET MESSAGE_TEXT = 'CNPJ não encontrado';
-    END IF;
-    
-    -- Verificar se a senha está correta para o CNPJ fornecido
-    SELECT COUNT(*) INTO senha_valida 
-    FROM tbl_empresa 
-    WHERE cnpj = p_cnpj AND senha = p_senha;
-    
-    -- Se a senha não for válida, retorna erro
-    IF senha_valida = 0 THEN
-        SIGNAL SQLSTATE '45000' 
-        SET MESSAGE_TEXT = 'Senha incorreta';
-    ELSE
-        -- Retornar os dados da empresa se o login for bem-sucedido
-        SELECT 
-            e.id_empresa,
-            e.nome_empresa,
-            e.nome_proprietario,
-            e.email,
-            e.cnpj,
-            e.telefone,
-            e.telefone_clinica,
-            end.cep,
-            end.logradouro,
-            end.bairro,
-            end.cidade,
-            end.estado
-        FROM tbl_empresa e
-        JOIN tbl_endereco_empresa end ON e.id_empresa = end.id_empresa
-        WHERE e.cnpj = p_cnpj;
-    END IF;
-    
+    -- Deletar o endereço associado à empresa
+    DELETE FROM tbl_endereco_empresa
+    WHERE id_empresa = OLD.id_empresa;
 END$$
 
 DELIMITER ;
 
-CALL sp_login_empresa('12345678910', 'Vini123');
 
-SELECT 
-    e.id_empresa,
-    e.nome_empresa,
-    e.nome_proprietario,
-    e.email,
-    e.cnpj,
-    e.telefone,
-    e.telefone_clinica,
-    end.cep,
-    end.logradouro,
-    end.bairro,
-    end.cidade,
-    end.estado
-FROM tbl_empresa e
-JOIN tbl_endereco_empresa end ON e.id_empresa = end.id_empresa
-WHERE e.cnpj = '12345678910' AND e.senha = 'Vini123';
-
-
-select * from tbl_empresa;
