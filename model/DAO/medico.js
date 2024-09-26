@@ -147,6 +147,36 @@ const filter = async function(crm){
     }
 }
 
+const filterBySpecialty = async function(especialidade){
+    try {
+        let sql = `            SELECT
+    m.nome AS nome_medico,
+    m.email AS email_medico,
+    m.telefone AS telefone_medico,
+    m.crm,
+    e.nome AS especialidade,
+    emp.nome_empresa
+FROM
+    tbl_medicos m
+JOIN
+    tbl_medico_especialidade me ON m.id_medico = me.id_medico
+JOIN
+    tbl_especialidades e ON me.id_especialidade = e.id_especialidade
+JOIN
+    tbl_empresa emp ON m.id_empresa = emp.id_empresa
+WHERE
+    e.nome LIKE '%${especialidade}%';`      
+
+        let rsFilter = await prisma.$queryRawUnsafe(sql)
+
+        return rsFilter
+
+    } catch (error) {
+        console.log(error)
+        return false
+    }
+}
+
 module.exports = {
     insert,
     update,
@@ -155,5 +185,6 @@ module.exports = {
     listById,
     ID,
     loginMedico,
-    filter
+    filter,
+    filterBySpecialty
 }

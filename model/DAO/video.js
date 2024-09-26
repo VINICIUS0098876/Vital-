@@ -112,11 +112,23 @@ const ID = async function(){
     }
 }
 
+const filter = async function(titulo){
+    try {
+        let sql = `select * from tbl_videos where titulo like "%${titulo}%"`        
+        let rsFilter = await prisma.$queryRawUnsafe(sql)
+        return rsFilter
+    } catch (error) {
+        console.log(error)
+        return false
+    }
+}
+
 module.exports = {
     insert,
     update,
     deletar,
     listAll,
     listById,
-    ID
+    ID,
+    filter
 }

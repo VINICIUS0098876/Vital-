@@ -9,9 +9,7 @@ CREATE TABLE tbl_sexo (
     descricao VARCHAR(20) NOT NULL UNIQUE
 );
 
-select * from tbl_sexo where descricao = 'Feminino';
 
-select * from tbl_sexo where id_sexo = 1;
 
 -- Inserir sexos padrão
 INSERT INTO tbl_sexo (descricao) VALUES ('Masculino');
@@ -31,9 +29,7 @@ CREATE TABLE tbl_empresa (
     telefone_clinica VARCHAR(30) NOT NULL
 );
 
-select * from tbl_empresa;
 
-select id_empresa from tbl_empresa where cnpj = 12345678910 and senha = 'Vini123';
 
 
 DELIMITER $$
@@ -435,14 +431,26 @@ select * from tbl_empresa_especialidade;
 -- Tabela de avaliações
 CREATE TABLE tbl_avaliacoes (
     id_avaliacao INT AUTO_INCREMENT PRIMARY KEY,
+	id_usuario INT,
     id_medico INT,
-    id_usuario INT,
     nota TINYINT NOT NULL CHECK (nota BETWEEN 1 AND 5), -- Nota de 1 a 5
     comentario TEXT,
     data_avaliacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (id_medico) REFERENCES tbl_medicos(id_medico) ON DELETE CASCADE,
     FOREIGN KEY (id_usuario) REFERENCES tbl_usuarios(id_usuario) ON DELETE CASCADE
 );
+
+drop table tbl_avaliacoes;
+
+SELECT a.nota, a.comentario, a.data_avaliacao, u.nome AS usuario_nome
+FROM tbl_avaliacoes a
+JOIN tbl_usuarios u ON a.id_usuario = u.id_usuario
+WHERE a.id_medico = 3;  -- substitua 2 pelo id do médico desejado
+
+
+select * from tbl_avaliacoes;
+
+
 
 -- Tabela de vídeos
 CREATE TABLE tbl_videos (
@@ -627,4 +635,42 @@ END$$
 
 DELIMITER ;
 
+
+
+SELECT tbl_usuarios.*
+            FROM tbl_usuarios
+            JOIN tbl_sexo ON tbl_usuarios.id_sexo = tbl_sexo.id_sexo
+            WHERE tbl_sexo.descricao = 'Masculino';
+            
+            
+            SELECT
+    m.nome AS nome_medico,
+    m.email AS email_medico,
+    m.telefone AS telefone_medico,
+    m.crm,
+    e.nome AS especialidade,
+    emp.nome_empresa
+FROM
+    tbl_medicos m
+JOIN
+    tbl_medico_especialidade me ON m.id_medico = me.id_medico
+JOIN
+    tbl_especialidades e ON me.id_especialidade = e.id_especialidade
+JOIN
+    tbl_empresa emp ON m.id_empresa = emp.id_empresa
+WHERE
+    e.nome LIKE '%Ortopedista%';
+    
+    
+    
+    SELECT
+    id_video,
+    titulo,
+    descricao,
+    data_publicacao,
+    url
+FROM
+    tbl_videos
+WHERE
+    titulo LIKE '%Exercícios%';
 

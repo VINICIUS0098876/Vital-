@@ -41,6 +41,8 @@ const bodyParserJSON = bodyParser.json()
     const controllerMedico = require('./controller/controller_medico.js')
     const controllerEspecialidade = require('./controller/controller_especialidade.js')
     const controllerVideo = require('./controller/controller_video.js')
+    const controllerAvaliacao = require('./controller/controller_avaliacao.js')
+
 
 
 /*********************** USUARIO ***********************************/
@@ -104,6 +106,14 @@ const bodyParserJSON = bodyParser.json()
             response.status(404);
         }
     });
+
+    app.get('/v1/vital/filtroSexo/filtro', cors(), async function(request, response, next){
+        let descricao = request.query.descricao
+        let dadosSexo = await controllerUsuario.setFilterBySexo(descricao)
+
+        response.status(dadosSexo.status_code)
+        response.json(dadosSexo)
+    })
 
     app.get('/v1/vital/usuario/:id', cors(), async function(request,response,next){
 
@@ -279,6 +289,14 @@ const bodyParserJSON = bodyParser.json()
         response.json(dadosMedico)
     })
 
+    app.get('/v1/vital/filtroMedicoEspecialidade/filtro', cors(), async function(request, response, next){
+        let especialidade = request.query.especialidade
+        let dadosMedico = await controllerMedico.setFiltrarPorEspecialidade(especialidade)
+
+        response.status(dadosMedico.status_code)
+        response.json(dadosMedico)
+    })
+
     app.get('/v1/vital/medico/:id', cors(), async function(request,response,next){
 
         // recebe o id da requisição
@@ -424,6 +442,14 @@ const bodyParserJSON = bodyParser.json()
         response.json(dadosVideo);
     })
 
+    app.get('/v1/vital/filtroVideo/filtro', cors(), async function(request, response, next){
+        let titulo = request.query.titulo
+        let dadosVideo = await controllerVideo.setFiltrar(titulo)
+
+        response.status(dadosVideo.status_code)
+        response.json(dadosVideo)
+    })
+
     app.delete('/v1/vital/video/:id', cors (), async function (request,response,next){
 
         let idVideo = request.params.id
@@ -446,6 +472,24 @@ const bodyParserJSON = bodyParser.json()
         response.json(resultUptadeVideo)
     
     })
+
+         /*********************** AVALIAÇÃO ***********************************/
+         app.post('/v1/vital/avaliacaoMedico', cors(), bodyParserJSON, async function (request, response,next ){
+
+
+            // recebe o ContentType com os tipos de dados encaminhados na requisição
+            let contentType = request.headers['content-type'];
+       
+            // vou receber o que chegar no corpo da requisição e guardar nessa variável local
+            let dadosBody = request.body;
+            // encaminha os dados para a controller enviar para o DAO
+            let resultDadosNovaAvaliacao = await controllerAvaliacao.setInserir(dadosBody, contentType)
+       
+       
+            response.status(resultDadosNovaAvaliacao.status_code);
+            response.json(resultDadosNovaAvaliacao);
+       
+        })
 
     app.listen('8080', function(){
         console.log('API funcionando!!')

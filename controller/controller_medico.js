@@ -304,6 +304,48 @@ const setFiltrar = async function(crm){
    }
 }
 
+const setFiltrarPorEspecialidade = async function(especialidade){
+    try {
+        // Recebe o nome da especialidade
+        let especialidadeMedico = especialidade
+    //Cria o objeto JSON
+    let medicoJSON = {}
+
+    //Validação para verificar se o id é válido(Vazio, indefinido e não numérico)
+    if(especialidadeMedico == '' || especialidadeMedico == undefined){
+        return message.ERROR_INVALID_ID // 400
+    }else{
+        
+        //Encaminha para o DAO localizar o id do filme 
+        let dadosMedico = await medicoDAO.filterBySpecialty(especialidade)
+        
+        
+        // Validação para verificar se existem dados de retorno
+        if(dadosMedico){
+
+            // Validação para verificar a quantidade de itens encontrados.
+            if(dadosMedico.length > 0){
+                //Criar o JSON de retorno
+                medicoJSON.medico = dadosMedico
+                medicoJSON.quantidade = dadosMedico.length
+                medicoJSON.status_code = 200
+    
+                
+                return medicoJSON
+            }else{
+                return message.ERROR_NOT_FOUND // 404
+            }
+
+        }else{
+            return message.ERROR_INTERNAL_SERVER_DB // 500
+        }
+    }
+   } catch (error) {
+       console.log(error)
+       return message.ERROR_INTERNAL_SERVER_DB
+   }
+}
+
 module.exports = {
     setInserir,
     setAtualizar,
@@ -311,5 +353,6 @@ module.exports = {
     setListar,
     setListarPorId,
     setLoginMedico,
-    setFiltrar
+    setFiltrar,
+    setFiltrarPorEspecialidade
 }

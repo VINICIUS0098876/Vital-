@@ -53,9 +53,6 @@ const loginUsuario = async function(email, senha) {
     }
 }
 
-
-
-
 const updateUsuario = async function(dadosUsuario, idUsuario){
     let sql
     try {
@@ -161,6 +158,20 @@ const idUsuario = async function(){
     }
 }
 
+const filterBySexo = async function(descricao){
+    try {
+        let sql = `SELECT tbl_usuarios.*
+            FROM tbl_usuarios
+            JOIN tbl_sexo ON tbl_usuarios.id_sexo = tbl_sexo.id_sexo
+            WHERE tbl_sexo.descricao = '${descricao}';`        
+        let rsFilter = await prisma.$queryRawUnsafe(sql)
+        return rsFilter
+    } catch (error) {
+        console.log(error)
+        return false
+    }
+}
+
 
 
 module.exports = {
@@ -171,5 +182,6 @@ module.exports = {
     selectAllUsuario,
     selectUsuarioById,
     idUsuario,
-    selectEnderecoByIdUsuario
+    selectEnderecoByIdUsuario,
+    filterBySexo
 }
