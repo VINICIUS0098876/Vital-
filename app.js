@@ -42,6 +42,7 @@ const bodyParserJSON = bodyParser.json()
     const controllerEspecialidade = require('./controller/controller_especialidade.js')
     const controllerVideo = require('./controller/controller_video.js')
     const controllerAvaliacao = require('./controller/controller_avaliacao.js')
+    const controllerConsulta = require('./controller/controller_consulta.js')
 
 
 
@@ -473,8 +474,8 @@ const bodyParserJSON = bodyParser.json()
     
     })
 
-         /*********************** AVALIAÇÃO ***********************************/
-         app.post('/v1/vital/avaliacaoMedico', cors(), bodyParserJSON, async function (request, response,next ){
+    /*********************** AVALIAÇÃO ***********************************/
+    app.post('/v1/vital/avaliacaoMedico', cors(), bodyParserJSON, async function (request, response,next ){
 
 
             // recebe o ContentType com os tipos de dados encaminhados na requisição
@@ -489,7 +490,76 @@ const bodyParserJSON = bodyParser.json()
             response.status(resultDadosNovaAvaliacao.status_code);
             response.json(resultDadosNovaAvaliacao);
        
-        })
+    })
+
+     /*********************** CONSULTAS ***********************************/
+     app.post('/v1/vital/consulta', cors(), bodyParserJSON, async function (request, response,next ){
+
+
+        // recebe o ContentType com os tipos de dados encaminhados na requisição
+        let contentType = request.headers['content-type'];
+   
+        // vou receber o que chegar no corpo da requisição e guardar nessa variável local
+        let dadosBody = request.body;
+        // encaminha os dados para a controller enviar para o DAO
+        let resultDadosNovaConsulta = await controllerConsulta.setInserir(dadosBody, contentType)
+   
+   
+        response.status(resultDadosNovaConsulta.status_code);
+        response.json(resultDadosNovaConsulta);
+   
+    })
+
+    app.get('/v1/vital/consulta', cors(),async function (request,response,next){
+
+
+        // chama a função da controller para retornar os filmes;
+        let dadosConsulta = await controllerConsulta.setListar()
+   
+        // validação para retornar o Json dos filmes ou retornar o erro 404;
+        if(dadosConsulta){
+            response.json(dadosConsulta);
+            response.status(dadosConsulta.status_code);
+        }else{
+            response.json({message: 'Nenhum registro foi encontrado'});
+            response.status(404);
+        }
+    });
+
+    app.get('/v1/vital/consulta/:id', cors(), async function(request,response,next){
+
+        // recebe o id da requisição
+        let idConsulta = request.params.id
+    
+        //encaminha o id para a acontroller buscar o filme
+        let dadosConsulta = await controllerConsulta.setListarPorId(idConsulta)
+    
+        response.status(dadosConsulta.status_code);
+        response.json(dadosConsulta);
+    })
+
+    app.delete('/v1/vital/consulta/:id', cors (), async function (request,response,next){
+
+        let idConsulta = request.params.id
+    
+        let dadosConsulta = await controllerConsulta.setDeletar(idConsulta);
+    
+        response.status(dadosConsulta.status_code);
+        response.json(dadosConsulta)
+    })
+
+    app.put('/v1/vital/consultaAtualizar/:id', cors(), bodyParserJSON, async function(request,response,next){
+
+        let idConsulta = request.params.id
+        let contentType = request.headers['content-type'];
+        let dadosBody = request.body
+    
+        let resultUptadeConsulta = await controllerConsulta.setUpdate(idConsulta, dadosBody, contentType)
+    
+        response.status(resultUptadeConsulta.status_code)
+        response.json(resultUptadeConsulta)
+    
+    })
 
     app.listen('8080', function(){
         console.log('API funcionando!!')

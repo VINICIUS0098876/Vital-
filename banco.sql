@@ -463,6 +463,135 @@ CREATE TABLE tbl_videos (
     FOREIGN KEY (id_empresa) REFERENCES tbl_empresa(id_empresa) ON DELETE CASCADE -- Se empresa for excluída, vídeos são excluídos
 );
 
+
+CREATE TABLE tbl_consultas (
+id_consulta INT AUTO_INCREMENT PRIMARY KEY,
+id_especialidade INT,
+id_medico INT,
+id_empresa INT,
+detalhes_consulta TEXT,
+dias_consulta DATE,
+horas_consulta TIME,
+FOREIGN KEY (id_especialidade) REFERENCES tbl_especialidades (id_especialidade),
+FOREIGN KEY (id_medico) REFERENCES tbl_medicos (id_medico),
+FOREIGN KEY (id_empresa) REFERENCES tbl_empresa (id_empresa)
+);
+
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_inserir_consulta_por_nome(
+    IN p_nome_medico VARCHAR(255),
+    IN p_nome_especialidade VARCHAR(255),
+    IN p_detalhes_consulta TEXT,
+    IN p_dias_consulta DATE,
+    IN p_horas_consulta TIME
+)
+BEGIN
+    DECLARE v_id_medico INT;
+    DECLARE v_id_especialidade INT;
+    DECLARE v_id_empresa INT;
+
+    -- Busca o ID do médico com base no nome
+    SELECT id_medico INTO v_id_medico
+    FROM tbl_medicos
+    WHERE nome = p_nome_medico
+    LIMIT 1;
+
+    -- Verifica se o médico foi encontrado
+    IF v_id_medico IS NULL THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Médico não encontrado';
+    END IF;
+
+    -- Busca o ID da especialidade com base no nome
+    SELECT id_especialidade INTO v_id_especialidade
+    FROM tbl_especialidades
+    WHERE nome = p_nome_especialidade
+    LIMIT 1;
+
+    -- Verifica se a especialidade foi encontrada
+    IF v_id_especialidade IS NULL THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Especialidade não encontrada';
+    END IF;
+
+    -- Busca a última empresa cadastrada
+    SELECT id_empresa INTO v_id_empresa
+    FROM tbl_empresa
+    ORDER BY id_empresa DESC
+    LIMIT 1;
+
+    -- Verifica se existe uma empresa cadastrada
+    IF v_id_empresa IS NULL THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Nenhuma empresa cadastrada encontrada';
+    END IF;
+
+    -- Insere a consulta associada ao médico, especialidade e à última empresa cadastrada
+    INSERT INTO tbl_consultas (id_medico, id_especialidade, id_empresa, detalhes_consulta, dias_consulta, horas_consulta)
+    VALUES (v_id_medico, v_id_especialidade, v_id_empresa, p_detalhes_consulta, p_dias_consulta, p_horas_consulta);
+    
+END$$
+
+DELIMITER ;
+
+drop procedure sp_inserir_consulta_por_nome;
+
+CALL sp_inserir_consulta_por_nome(
+    'Vinicius',         -- Nome do médico
+    'Ortopedista',            -- Nome da especialidade
+    'Consulta inicial',       -- Detalhes da consulta
+    '2024-10-01',             -- Data da consulta
+    '10:30:00'                -- Hora da consulta
+);
+
+SELECT 
+    c.id_consulta,
+    c.detalhes_consulta,
+    c.dias_consulta,
+    c.horas_consulta,
+    m.nome AS nome_medico,
+    e.nome AS nome_especialidade,
+     nome_empresa
+FROM 
+    tbl_consultas c
+INNER JOIN 
+    tbl_medicos m ON c.id_medico = m.id_medico
+INNER JOIN 
+    tbl_especialidades e ON c.id_especialidade = e.id_especialidade
+INNER JOIN 
+    tbl_empresa emp ON c.id_empresa = emp.id_empresa
+ORDER BY 
+    c.id_consulta DESC
+LIMIT 1;
+
+
+CREATE VIEW vw_todas_consultas AS
+SELECT 
+    c.id_consulta,
+    c.detalhes_consulta,
+    c.dias_consulta,
+    c.horas_consulta,
+    m.nome AS nome_medico,
+    e.nome AS nome_especialidade,
+    emp.nome_empresa
+FROM 
+    tbl_consultas c
+INNER JOIN 
+    tbl_medicos m ON c.id_medico = m.id_medico
+INNER JOIN 
+    tbl_especialidades e ON c.id_especialidade = e.id_especialidade
+INNER JOIN 
+    tbl_empresa emp ON c.id_empresa = emp.id_empresa
+ORDER BY 
+    c.id_consulta DESC;
+
+select * from vw_todas_consultas;
+
+select * from vw_todas_consultas where id_consulta = 2;
+
+
 DELIMITER $$
 
 CREATE PROCEDURE sp_inserir_video_ultima_empresa(
