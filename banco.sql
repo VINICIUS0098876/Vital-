@@ -150,6 +150,8 @@ CREATE TABLE tbl_medicos (
     FOREIGN KEY (id_empresa) REFERENCES tbl_empresa(id_empresa) ON DELETE CASCADE -- Se empresa for excluída, médicos são excluídos
 );
 
+select tbl_medicos.nome from tbl_usuarios where id_medico = 3;
+
 
 -- Procedure Cadastrar médico na última empresa cadastrada
 DELIMITER $$
@@ -667,12 +669,14 @@ SELECT
     u.email,
     u.senha,
     u.cpf,
-    s.descricao AS sexo,
+    s.id_sexo,
     u.data_nascimento
 FROM
     tbl_usuarios u
 JOIN
     tbl_sexo s ON u.id_sexo = s.id_sexo;
+    
+    drop view vw_usuarios_enderecos;
    
    
 
@@ -802,4 +806,6 @@ FROM
     tbl_videos
 WHERE
     titulo LIKE '%Exercícios%';
+    
+    select * from tbl_sexo where descricao = 'Masculino';
 
