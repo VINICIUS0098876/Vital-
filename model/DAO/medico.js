@@ -177,6 +177,23 @@ WHERE
     }
 }
 
+const selectNameById = async function(id){
+    try {
+        // Realiza a busca do genero pelo ID
+        let sql = `select tbl_medicos.nome, tbl_medicos.email from tbl_medicos where id_medico = ${id}`;
+    
+        // Executa no banco de dados o script sql
+        let rsUsuario = await prisma.$queryRawUnsafe(sql);
+
+            return rsUsuario;
+    
+        } catch (error) {
+            console.log(error);
+            return false;
+            
+        }
+}
+
 module.exports = {
     insert,
     update,
@@ -186,5 +203,6 @@ module.exports = {
     ID,
     loginMedico,
     filter,
-    filterBySpecialty
+    filterBySpecialty,
+    selectNameById
 }

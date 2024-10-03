@@ -172,6 +172,23 @@ const filterBySexo = async function(descricao){
     }
 }
 
+const selectNameById = async function(id){
+    try {
+        // Realiza a busca do genero pelo ID
+        let sql = `select tbl_usuarios.nome, tbl_usuarios.email from tbl_usuarios where id_usuario = ${id}`;
+    
+        // Executa no banco de dados o script sql
+        let rsUsuario = await prisma.$queryRawUnsafe(sql);
+
+            return rsUsuario;
+    
+        } catch (error) {
+            console.log(error);
+            return false;
+            
+        }
+}
+
 
 
 module.exports = {
@@ -183,5 +200,6 @@ module.exports = {
     selectUsuarioById,
     idUsuario,
     selectEnderecoByIdUsuario,
-    filterBySexo
+    filterBySexo,
+    selectNameById
 }

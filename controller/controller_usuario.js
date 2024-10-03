@@ -192,13 +192,13 @@ const setListarUsuario = async function(){
 
         if(dadosUsuario.length> 0){
 
-            // for(let usuario of dadosUsuario){
-            //   let sexoUsuario = await sexoDAO.selectByIdSexo(usuario.id_sexo)
-            // //   let enderecoUsuario = await enderecoUsuarioDAO.selectByIdEnderecoUsuario(usuario.id_endereco)
-            //   delete usuario.id_sexo
-            //    usuario.sexo = sexoUsuario
-            // //    usuario.endereco = enderecoUsuario
-            // }
+            for(let usuario of dadosUsuario){
+              let sexoUsuario = await sexoDAO.selectByIdSexo(usuario.id_sexo)
+            //   let enderecoUsuario = await enderecoUsuarioDAO.selectByIdEnderecoUsuario(usuario.id_endereco)
+              delete usuario.id_sexo
+               usuario.sexo = sexoUsuario
+            //    usuario.endereco = enderecoUsuario
+            }
 
             usuarioJSON.usuarios = dadosUsuario
             usuarioJSON.quantidade = dadosUsuario.length
@@ -242,6 +242,15 @@ const setListarUsuarioById = async function(id){
 
             // Validação para verificar a quantidade de itens encontrados.
             if(dadosUsuario.length > 0){
+
+                for(let usuario of dadosUsuario){
+                    let sexoUsuario = await sexoDAO.selectByIdSexo(usuario.id_sexo)
+                  //   let enderecoUsuario = await enderecoUsuarioDAO.selectByIdEnderecoUsuario(usuario.id_endereco)
+                    delete usuario.id_sexo
+                     usuario.sexo = sexoUsuario
+                  //    usuario.endereco = enderecoUsuario
+                  }
+
                 //Criar o JSON de retorno
                 usuarioJSON.usuario = dadosUsuario
                 usuarioJSON.status_code = 200
@@ -288,6 +297,15 @@ const setFilterBySexo = async function(descricao){
 
             // Validação para verificar a quantidade de itens encontrados.
             if(dadosSexo.length > 0){
+
+                for(let usuario of dadosSexo){
+              let sexoUsuario = await sexoDAO.selectByIdSexo(usuario.id_sexo)
+            //   let enderecoUsuario = await enderecoUsuarioDAO.selectByIdEnderecoUsuario(usuario.id_endereco)
+              delete usuario.id_sexo
+               usuario.sexo = sexoUsuario
+            //    usuario.endereco = enderecoUsuario
+            }
+                
                 //Criar o JSON de retorno
                 sexoJSON.usuarios = dadosSexo
                 sexoJSON.quantidade = dadosSexo.length

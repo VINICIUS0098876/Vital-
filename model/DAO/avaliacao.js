@@ -25,13 +25,78 @@ const insert = async function(dadosAvaliacao){
     }
 }
 
-const update = async function(){}
+const update = async function(dadosAvaliacao, idAvaliacao){
+    let sql
+    try {
+        sql = `update tbl_avaliacoes set
+        id_usuario = '${dadosAvaliacao.id_usuario}',
+        id_medico = '${dadosAvaliacao.id_medico}',
+        nota = '${dadosAvaliacao.nota}',
+        comentario = '${dadosAvaliacao.comentario}',
+        data_avaliacao = '${dadosAvaliacao.data_avaliacao}'
+        where tbl_avaliacoes.id_avaliacao = ${idAvaliacao}`
+        
+        console.log(sql)
+        let result = await prisma.$executeRawUnsafe(sql)
+        if(result){
+        return true
+     }else{
+        return false
+     }
+    } catch (error) {
+        console.log(error);
+        return false
+    }
+}
 
-const deletar = async function(){}
+const deletar = async function(id){
+    try {
+        let sql = `delete from tbl_avaliacoes WHERE id_avaliacao = ${id}`
 
-const listAll = async function(){}
 
-const listById = async function(){}
+        
+        let rsUsuario = await prisma.$executeRawUnsafe(sql);
+        console.log(sql);
+
+        return rsUsuario
+    } catch (error) {
+        console.log(error)
+        return false
+    }
+}
+
+const listAll = async function(){
+    try {
+        let sql = 'SELECT * FROM tbl_avaliacoes';
+
+
+    let rsUsuario = await prisma.$queryRawUnsafe(sql)
+
+
+    if(rsUsuario.length > 0 )
+    return rsUsuario
+    } catch (error) {
+        console.log(error);
+        return false
+    };
+}
+
+const listById = async function(id){
+    try {
+        // Realiza a busca do genero pelo ID
+        let sql = `select * from tbl_avaliacoes where id_avaliacao = ${id}`;
+    
+        // Executa no banco de dados o script sql
+        let rsUsuario = await prisma.$queryRawUnsafe(sql);
+
+            return rsUsuario;
+    
+        } catch (error) {
+            console.log(error);
+            return false;
+            
+        }
+}
 
 const ID = async function(){
     try {

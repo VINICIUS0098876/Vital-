@@ -1,6 +1,8 @@
 // Import do arquivo responsavel pela interação com DB(model)
 const { application } = require('express')
-const avaliacaoDAO = require('../model/DAO/empresa')
+const avaliacaoDAO = require('../model/DAO/avaliacao.js')
+const usuarioDAO = require('../model/DAO/usuario.js')
+const medicoDAO = require('../model/DAO/medico.js')
 // Import do arquivo de configuração do projeto
 const message = require('../modulo/config.js')
 const { join } = require('@prisma/client/runtime/library.js')
@@ -56,13 +58,191 @@ const setInserir = async function(dados, contentType){
         }
 }
 
-const setUpdate = async function(){}
+const setUpdate = async function(id, dadoAtualizado, contentType){
+    try{
 
-const setDeletar = async function(){}
+        let idAvaliacao = id
 
-const setListar = async function(){}
+        // console.log(dadoAtualizado);
+        // Validação de content-type (apenas aplication/json)
+        if(String(contentType).toLowerCase() == 'application/json'){
+            let dadosID = avaliacaoDAO.listById(idAvaliacao)
 
-const setListarPorId = async function(){}
+            
+            if(idAvaliacao == '' || idAvaliacao == undefined || idAvaliacao == isNaN(idAvaliacao) || idAvaliacao == null){
+                return message.ERROR_INVALID_ID
+                
+            }else if(idAvaliacao>dadosID.length){
+                return message.ERROR_NOT_FOUND
+            }else{
+                // Cria o objeto JSON para devolver os dados criados na requisição
+                let atualizarJSON = {}
+                
+                
+                    //Validação de campos obrigatórios ou com digitação inválida
+                    if(dadoAtualizado.nota == ''    || dadoAtualizado.nota == undefined       ||  dadoAtualizado.nota == null               || dadoAtualizado.nota.length > 1 ||
+                    dadoAtualizado.comentario == '' ||  dadoAtualizado.comentario == undefined || dadoAtualizado.comentario == null  || dadoAtualizado.comentario.length > 355 ||
+                    dadoAtualizado.data_avaliacao == '' ||  dadoAtualizado.data_avaliacao == undefined || dadoAtualizado.data_avaliacao == null  || dadoAtualizado.data_avaliacao.length > 11 
+     ){
+                        return message.ERROR_REQUIRED_FIELDS
+                    }
+                
+                    else{
+
+                       
+                        
+                            // Encaminha os dados do filme para o DAO inserir no DB
+                            let dadosAvaliacao = await avaliacaoDAO.update(dadoAtualizado, idAvaliacao)
+                
+                            // Validação para verificar se o DAO inseriu os dados do DB
+                        
+                            if(dadosAvaliacao){
+                    
+                                //Cria o JSON de retorno dos dados (201)
+                                atualizarJSON.avaliacao      = dadosAvaliacao
+                                atualizarJSON.status      = message.SUCCESS_UPDATED_ITEM.status
+                                atualizarJSON.status_code = message.SUCCESS_UPDATED_ITEM.status_code
+                                atualizarJSON.message     = message.SUCCESS_UPDATED_ITEM.message
+                                return atualizarJSON //201
+                                
+                            }else{
+                                return message.ERROR_INTERNAL_SERVER_DB //500
+                            }
+                        
+                
+                    }
+                    
+                }
+            }else{
+                return message.ERROR_CONTENT_TYPE //415
+            }
+
+
+        }catch(error){
+            console.log(error)
+        return message.ERROR_INTERNAL_SERVER //500 - erro na controller
+    }
+}
+
+const setDeletar = async function(id){
+    try {
+        let idAvaliacao = id
+    
+        if(idAvaliacao == '' || idAvaliacao == undefined || idAvaliacao == isNaN(idAvaliacao) || idAvaliacao == null){
+            return message.ERROR_INVALID_ID
+        }else{        
+
+            let dadosAvaliacao = await avaliacaoDAO.deletar(idAvaliacao)
+    
+        
+            if(dadosAvaliacao){
+              return  message.SUCCESS_DELETED_ITEM
+            }else{
+                return message.ERROR_NOT_FOUND
+            }
+        }
+    } catch (error) {
+        console.log(error)
+        return message.ERROR_INTERNAL_SERVER
+    }
+}
+
+const setListar = async function(){
+    try {
+        let JSON = {}
+
+
+   let dadosAvaliacao = await avaliacaoDAO.listAll()
+   {
+    if(dadosAvaliacao){
+
+
+        if(dadosAvaliacao.length> 0){
+
+
+            for(let usuario of dadosAvaliacao){
+                let nomeUsuario = await usuarioDAO.selectNameById(usuario.id_usuario)
+                let nomeMedico = await medicoDAO.selectNameById(usuario.id_medico)
+                delete usuario.id_usuario
+                delete usuario.id_medico
+                usuario.usuario = nomeUsuario
+                usuario.medico = nomeMedico
+            }
+
+
+            JSON.avaliacoes = dadosAvaliacao
+            JSON.quantidade = dadosAvaliacao.length
+            JSON.status_code = 200
+            return JSON
+        }else{
+            return message.ERROR_NOT_FOUND
+        }
+    }else{
+        return message.ERROR_INTERNAL_SERVER_DB
+    }
+
+
+    }
+    }
+    catch (error) {
+        console.log(error);
+        return message.ERROR_INTERNAL_SERVER
+}
+}
+
+const setListarPorId = async function(id){
+    try {
+        // Recebe o id do filme
+     
+    let idAvaliacao = id
+
+    //Cria o objeto JSON
+    let JSON = {}
+
+
+    //Validação para verificar se o id é válido(Vazio, indefinido e não numérico)
+    if(idAvaliacao == '' || idAvaliacao == undefined || isNaN(idAvaliacao)){
+        return message.ERROR_INVALID_ID // 400
+    }else{
+
+        //Encaminha para o DAO localizar o id do filme 
+        let dadosAvaliacao = await avaliacaoDAO.listById(idAvaliacao)
+
+        // Validação para verificar se existem dados de retorno
+        if(dadosAvaliacao){
+
+            // Validação para verificar a quantidade de itens encontrados.
+            if(dadosAvaliacao.length > 0){
+
+                for(let usuario of dadosAvaliacao){
+                    let nomeUsuario = await usuarioDAO.selectNameById(usuario.id_usuario)
+                    let nomeMedico = await medicoDAO.selectNameById(usuario.id_medico)
+                    delete usuario.id_usuario
+                    delete usuario.id_medico
+                    usuario.usuario = nomeUsuario
+                    usuario.medico = nomeMedico
+                }
+
+
+                //Criar o JSON de retorno
+                JSON.avaliacao = dadosAvaliacao
+                JSON.status_code = 200
+    
+                
+                return JSON
+            }else{
+                return message.ERROR_NOT_FOUND // 404
+            }
+
+        }else{
+            return message.ERROR_INTERNAL_SERVER_DB // 500
+        }
+    }
+   } catch (error) {
+       console.log(error)
+       return message.ERROR_INTERNAL_SERVER_DB
+   }
+}
 
 module.exports = {
     setInserir,

@@ -492,6 +492,57 @@ const bodyParserJSON = bodyParser.json()
        
     })
 
+    app.get('/v1/vital/avaliacao', cors(),async function (request,response,next){
+
+
+        // chama a função da controller para retornar os filmes;
+        let dadosAvaliacao = await controllerAvaliacao.setListar()
+   
+        // validação para retornar o Json dos filmes ou retornar o erro 404;
+        if(dadosAvaliacao){
+            response.json(dadosAvaliacao);
+            response.status(dadosAvaliacao.status_code);
+        }else{
+            response.json({message: 'Nenhum registro foi encontrado'});
+            response.status(404);
+        }
+    });
+
+    app.get('/v1/vital/avaliacao/:id', cors(), async function(request,response,next){
+
+        // recebe o id da requisição
+        let idAvaliacao = request.params.id
+    
+        //encaminha o id para a acontroller buscar o filme
+        let dadosAvaliacao = await controllerAvaliacao.setListarPorId(idAvaliacao)
+    
+        response.status(dadosAvaliacao.status_code);
+        response.json(dadosAvaliacao);
+    })
+
+    app.delete('/v1/vital/avaliacao/:id', cors (), async function (request,response,next){
+
+        let idAvaliacao = request.params.id
+    
+        let dadosAvaliacao = await controllerAvaliacao.setDeletar(idAvaliacao);
+    
+        response.status(dadosAvaliacao.status_code);
+        response.json(dadosAvaliacao)
+    })
+
+    app.put('/v1/vital/avaliacaoAtualizar/:id', cors(), bodyParserJSON, async function(request,response,next){
+
+        let idAvaliacao = request.params.id
+        let contentType = request.headers['content-type'];
+        let dadosBody = request.body
+    
+        let resultUptadeAvaliacao = await controllerAvaliacao.setUpdate(idAvaliacao, dadosBody, contentType)
+    
+        response.status(resultUptadeAvaliacao.status_code)
+        response.json(resultUptadeAvaliacao)
+    
+    })
+
      /*********************** CONSULTAS ***********************************/
      app.post('/v1/vital/consulta', cors(), bodyParserJSON, async function (request, response,next ){
 
