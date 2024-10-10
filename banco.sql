@@ -693,6 +693,8 @@ END$$
 
 DELIMITER ;
 
+drop trigger trg_delete_usuario_endereco;
+
 
 
 -- Deletar um usuário (e automaticamente seu endereço será deletado)
