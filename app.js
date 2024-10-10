@@ -93,6 +93,40 @@ const bodyParserJSON = bodyParser.json()
         response.json(dadosUsuario)
     })
 
+    // Receber o token encaminhando nas requisições  e solicitar a validação
+    const verifyJWT = async function(request, response, next){
+        // Import da biblioteca para a validação do token 
+        const jwt = require('./middleware/middlewareJWT.js')
+
+        // Recebe o token encaminhando no header da requisição
+        let token = request.headers['x-access-token']
+
+        // Valida a autenticidade do Token
+        const autenticidadeToken = await jwt.validateJWT(token)
+
+        // Verifica se a requisição poderá continuar ou se será encerrada
+        if(autenticidadeToken){
+            next()
+        }else{
+            return response.status(401).end()
+        }
+    }
+
+    app.get('/v1/vital/usuariosjwt', verifyJWT, cors(),async function (request,response,next){
+
+        // chama a função da controller para retornar os filmes;
+        let dadosUsuario= await controllerUsuario.setListarUsuario();
+    
+        // validação para retornar o Json dos filmes ou retornar o erro 404;
+        if(dadosUsuario){
+            response.json(dadosUsuario);
+            response.status(dadosUsuario.status_code);
+        }else{
+            response.json({message: 'Nenhum registro foi encontrado'});
+            response.status(404);
+        }
+    });
+
     app.get('/v1/vital/usuario', cors(),async function (request,response,next){
 
         // chama a função da controller para retornar os filmes;

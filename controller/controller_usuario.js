@@ -2,6 +2,7 @@
 const { application } = require('express')
 const usuarioDAO = require('../model/DAO/usuario')
 const sexoDAO = require('../model/DAO/sexo.js')
+const jwt = require('../middleware/middlewareJWT.js')
 
 // Import do arquivo de configuração do projeto
 const message = require('../modulo/config.js')
@@ -70,17 +71,20 @@ const setInserirUsuario = async function(dadosUsuario, contentType){
 const setLoginUsuario = async function(email, senha) {
     try {
         let JSON = {};
+
         let dadosUsuario = await usuarioDAO.loginUsuario(email, senha);
 
         if (dadosUsuario.length === 0) {
             return { status_code: 400, message: 'Empresa não encontrada ou senha incorreta' };
         }
 
-        console.log(senha);
+        // Gera o token pelo JWT
+        let tokenUser = await jwt.createJWT(dadosUsuario.id_usuario)
         
         // Se tudo estiver correto, retorna a Empresa e uma mensagem de sucesso
         JSON.id_usuario = dadosUsuario[0].id_usuario;
         JSON.usuario = dadosUsuario[0].nome
+        JSON.token = tokenUser
         JSON.status_code = message.SUCCESS_LOGIN_ITEM.status_code;
         JSON.message = message.SUCCESS_LOGIN_ITEM;
         return JSON;
