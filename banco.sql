@@ -9,13 +9,9 @@ CREATE TABLE tbl_sexo (
     descricao VARCHAR(20) NOT NULL UNIQUE
 );
 
-
-
 -- Inserir sexos padrão
 INSERT INTO tbl_sexo (descricao) VALUES ('Masculino');
 INSERT INTO tbl_sexo (descricao) VALUES ('Feminino');
-
-
 
 -- Tabela de empresas
 CREATE TABLE tbl_empresa (
@@ -28,9 +24,6 @@ CREATE TABLE tbl_empresa (
     telefone VARCHAR(30) NOT NULL,
     telefone_clinica VARCHAR(30) NOT NULL
 );
-
-
-
 
 DELIMITER $$
 
@@ -64,8 +57,6 @@ BEGIN
     VALUES (p_cep, p_logradouro, p_bairro, p_cidade, p_estado, last_user_id);
 END$$
 
-
-
 DELIMITER ;
 CALL sp_inserir_empresa_com_endereco(
 'VITAL+',
@@ -82,7 +73,6 @@ CALL sp_inserir_empresa_com_endereco(
     'São Paulo'
 );
 
-drop view vw_empresas_enderecos;
 CREATE VIEW vw_empresas_enderecos AS
 SELECT
     u.id_empresa,
@@ -103,9 +93,6 @@ FROM
 JOIN
     tbl_endereco_empresa e ON u.id_empresa = e.id_empresa;
    
-    select * from vw_empresas_enderecos;
-
-
 
 CREATE TABLE tbl_endereco_empresa(
 id_endereco_empresa INT PRIMARY KEY AUTO_INCREMENT,
@@ -133,10 +120,6 @@ CREATE TABLE tbl_usuarios (
 );
 
 
-drop table tbl_enderecos;
-
-select * from tbl_enderecos where id_endereco = 2;
-
 -- Tabela de médicos
 CREATE TABLE tbl_medicos (
     id_medico INT AUTO_INCREMENT PRIMARY KEY,
@@ -150,12 +133,8 @@ CREATE TABLE tbl_medicos (
     FOREIGN KEY (id_empresa) REFERENCES tbl_empresa(id_empresa) ON DELETE CASCADE -- Se empresa for excluída, médicos são excluídos
 );
 
-select tbl_medicos.nome from tbl_usuarios where id_medico = 3;
-
-
 -- Procedure Cadastrar médico na última empresa cadastrada
 DELIMITER $$
-
 
 CREATE PROCEDURE sp_inserir_medico_ultima_empresa(
     IN p_nome VARCHAR(255),
@@ -189,11 +168,7 @@ BEGIN
     END IF;
 END$$
 
-
 DELIMITER ;
-
-drop procedure sp_inserir_medico_ultima_empresa;
-
 CALL sp_inserir_medico_ultima_empresa(
     'Dra. Ana Pereira',            -- Nome do médico
     'dra.ana@email.com',           -- Email do médico
@@ -202,29 +177,6 @@ CALL sp_inserir_medico_ultima_empresa(
     'CRM987654',                   -- CRM do médico
     '1980-05-15'                   -- Data de nascimento
 );
-
-CREATE VIEW vw_medico_empresa AS
-SELECT
-    m.id_medico,
-    m.nome AS nome_medico,
-    m.email AS email_medico,
-    m.telefone AS telefone_medico,
-    m.crm,
-    m.data_nascimento AS data_nascimento_medico,
-    e.id_empresa,
-    e.nome_empresa,
-    e.nome_proprietario,
-    e.cnpj,
-    e.email AS email_empresa,
-    e.telefone,
-    e.telefone_clinica
-   
-FROM
-    tbl_medicos m
-JOIN
-    tbl_empresa e ON m.id_empresa = e.id_empresa;
-    
-    drop view vw_medico_empresa;
     
     CREATE VIEW vw_medico_empresa AS
 SELECT
@@ -251,18 +203,7 @@ JOIN
 JOIN
     tbl_especialidades es ON me.id_especialidade = es.id_especialidade;
 
-    
-    
-   
- 
-   
-    select * from vw_medico_empresa;
-   
-    desc tbl_empresa;
-
-
 DELIMITER $$
-
 CREATE PROCEDURE sp_inserir_medico_com_especialidades(
     IN p_nome VARCHAR(255),
     IN p_email VARCHAR(320),
@@ -305,10 +246,7 @@ BEGIN
     END WHILE;
 
 END$$
-
 DELIMITER ;
-
-
 CALL sp_inserir_medico_com_especialidades(
     'Dr. João Silva',
     'joao.silva@hospital.com',
@@ -319,32 +257,6 @@ CALL sp_inserir_medico_com_especialidades(
     'Dermatologista' -- Especialidades separadas por vírgula
 );
 
-select * from tbl_especialidades;
-
-
-
-
-
-
-
-
-SELECT
-    m.nome AS nome_medico,
-    e.nome AS especialidade,
-    emp.nome_empresa AS nome_empresa
-FROM
-    tbl_medico_especialidade me
-JOIN
-    tbl_medicos m ON me.id_medico = m.id_medico
-JOIN
-    tbl_especialidades e ON me.id_especialidade = e.id_especialidade
-JOIN
-    tbl_empresa emp ON m.id_empresa = emp.id_empresa;
-
-
-
-
-
 -- Tabela de especialidades
 CREATE TABLE tbl_especialidades (
     id_especialidade INT AUTO_INCREMENT PRIMARY KEY,
@@ -352,21 +264,11 @@ CREATE TABLE tbl_especialidades (
     descricao TEXT NOT NULL,         -- Descrição da especialidade
     imagem_url VARCHAR(255) NOT NULL -- URL da imagem armazenada no Firebase
 );
-
-select * from tbl_especialidades;
-
-select * from tbl_especialidades where nome like "%Ort%";
-
-show tables;
-
-insert into tbl_especialidades(nome, descricao, imagem_url)values
-(
+insert into tbl_especialidades(nome, descricao, imagem_url)values(
 "Cardiologista",
 "Um cardiologista é um médico que trata doenças do coração e vasos sanguíneos.",
 "https://vitaclinica.com.br/wp-content/uploads/2019/08/Cardiologista-1-1200x800.jpg"
 );
-
-select * from tbl_medico_especialidade;
 
 -- Tabela intermediária médico-especialidade
 CREATE TABLE tbl_medico_especialidade (
@@ -387,7 +289,6 @@ CREATE TABLE tbl_empresa_especialidade (
 );
 
 DELIMITER $$
-
 CREATE PROCEDURE sp_inserir_especialidade_com_empresa(
     IN p_nome_especialidade VARCHAR(255),
     IN p_descricao_especialidade TEXT,
@@ -417,7 +318,6 @@ BEGIN
         SET MESSAGE_TEXT = 'Nenhuma empresa encontrada para associar a especialidade';
     END IF;
 END$$
-
 DELIMITER ;
 
 CALL sp_inserir_especialidade_com_empresa(
@@ -425,10 +325,6 @@ CALL sp_inserir_especialidade_com_empresa(
     'Especialista em problemas ósseos e musculares.',
     'https://link_da_imagem.com/ortopedista.jpg'
 );
-select * from tbl_empresa_especialidade;
-
-
-
 
 -- Tabela de avaliações
 CREATE TABLE tbl_avaliacoes (
@@ -442,18 +338,6 @@ CREATE TABLE tbl_avaliacoes (
     FOREIGN KEY (id_usuario) REFERENCES tbl_usuarios(id_usuario) ON DELETE CASCADE
 );
 
-drop table tbl_avaliacoes;
-
-SELECT a.nota, a.comentario, a.data_avaliacao, u.nome AS usuario_nome
-FROM tbl_avaliacoes a
-JOIN tbl_usuarios u ON a.id_usuario = u.id_usuario
-WHERE a.id_medico = 3;  -- substitua 2 pelo id do médico desejado
-
-
-select * from tbl_avaliacoes;
-
-
-
 -- Tabela de vídeos
 CREATE TABLE tbl_videos (
     id_video INT AUTO_INCREMENT PRIMARY KEY,
@@ -464,7 +348,6 @@ CREATE TABLE tbl_videos (
     data_publicacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (id_empresa) REFERENCES tbl_empresa(id_empresa) ON DELETE CASCADE -- Se empresa for excluída, vídeos são excluídos
 );
-
 
 CREATE TABLE tbl_consultas (
 id_consulta INT AUTO_INCREMENT PRIMARY KEY,
@@ -478,7 +361,6 @@ FOREIGN KEY (id_especialidade) REFERENCES tbl_especialidades (id_especialidade),
 FOREIGN KEY (id_medico) REFERENCES tbl_medicos (id_medico),
 FOREIGN KEY (id_empresa) REFERENCES tbl_empresa (id_empresa)
 );
-
 
 DELIMITER $$
 
@@ -538,8 +420,6 @@ END$$
 
 DELIMITER ;
 
-drop procedure sp_inserir_consulta_por_nome;
-
 CALL sp_inserir_consulta_por_nome(
     'Vinicius',         -- Nome do médico
     'Ortopedista',            -- Nome da especialidade
@@ -547,27 +427,6 @@ CALL sp_inserir_consulta_por_nome(
     '2024-10-01',             -- Data da consulta
     '10:30:00'                -- Hora da consulta
 );
-
-SELECT 
-    c.id_consulta,
-    c.detalhes_consulta,
-    c.dias_consulta,
-    c.horas_consulta,
-    m.nome AS nome_medico,
-    e.nome AS nome_especialidade,
-     nome_empresa
-FROM 
-    tbl_consultas c
-INNER JOIN 
-    tbl_medicos m ON c.id_medico = m.id_medico
-INNER JOIN 
-    tbl_especialidades e ON c.id_especialidade = e.id_especialidade
-INNER JOIN 
-    tbl_empresa emp ON c.id_empresa = emp.id_empresa
-ORDER BY 
-    c.id_consulta DESC
-LIMIT 1;
-
 
 CREATE VIEW vw_todas_consultas AS
 SELECT 
@@ -588,10 +447,6 @@ INNER JOIN
     tbl_empresa emp ON c.id_empresa = emp.id_empresa
 ORDER BY 
     c.id_consulta DESC;
-
-select * from vw_todas_consultas;
-
-select * from vw_todas_consultas where id_consulta = 2;
 
 
 DELIMITER $$
@@ -621,7 +476,6 @@ END$$
 
 DELIMITER ;
 
-
 CALL sp_inserir_video_ultima_empresa(
     'Exercícios Físicos',
     'Este vídeo apresenta alguns exercícios físicos.',
@@ -647,20 +501,9 @@ FROM
 JOIN
     tbl_empresa e ON v.id_empresa = e.id_empresa;
 
-
-select * from vw_videos_empresas;
-
-
-
-
 -- Índices para melhorar a performance de buscas frequentes
 CREATE INDEX idx_email_usuario ON tbl_usuarios(email);
 CREATE INDEX idx_crm_medico ON tbl_medicos(crm);
-
-
-
-
-
 
 CREATE VIEW vw_usuarios_enderecos AS
 SELECT
@@ -676,10 +519,6 @@ FROM
 JOIN
     tbl_sexo s ON u.id_sexo = s.id_sexo;
     
-    drop view vw_usuarios_enderecos;
-   
-   
-
 DELIMITER $$
 
 CREATE TRIGGER trg_delete_usuario_endereco
@@ -692,34 +531,6 @@ BEGIN
 END$$
 
 DELIMITER ;
-
-drop trigger trg_delete_usuario_endereco;
-
-
-
--- Deletar um usuário (e automaticamente seu endereço será deletado)
-DELETE FROM tbl_usuarios
-WHERE id_usuario = 1;
-
-SELECT * FROM tbl_usuarios;
-
-
-
-
-
-
-
-
-
-           
-
-
-
-
-
-
-
-
 
 CREATE VIEW vw_empresa_completa AS
 SELECT
@@ -755,7 +566,6 @@ LEFT JOIN
 LEFT JOIN
     tbl_especialidades esp ON me.id_especialidade = esp.id_especialidade;
 
-select * from vw_empresa_completa;
 
 DELIMITER $$
 
@@ -769,45 +579,3 @@ BEGIN
 END$$
 
 DELIMITER ;
-
-
-
-SELECT tbl_usuarios.*
-            FROM tbl_usuarios
-            JOIN tbl_sexo ON tbl_usuarios.id_sexo = tbl_sexo.id_sexo
-            WHERE tbl_sexo.descricao = 'Masculino';
-            
-            
-            SELECT
-    m.nome AS nome_medico,
-    m.email AS email_medico,
-    m.telefone AS telefone_medico,
-    m.crm,
-    e.nome AS especialidade,
-    emp.nome_empresa
-FROM
-    tbl_medicos m
-JOIN
-    tbl_medico_especialidade me ON m.id_medico = me.id_medico
-JOIN
-    tbl_especialidades e ON me.id_especialidade = e.id_especialidade
-JOIN
-    tbl_empresa emp ON m.id_empresa = emp.id_empresa
-WHERE
-    e.nome LIKE '%Ortopedista%';
-    
-    
-    
-    SELECT
-    id_video,
-    titulo,
-    descricao,
-    data_publicacao,
-    url
-FROM
-    tbl_videos
-WHERE
-    titulo LIKE '%Exercícios%';
-    
-    select * from tbl_sexo where descricao = 'Masculino';
-
