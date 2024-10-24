@@ -11,7 +11,7 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  url      = env("DATABASE_URL")
+  url      = "mysql://root:vital123@database-1.cvs068a6on8m.us-east-1.rds.amazonaws.com:3306/db_vital"
 }
 
 model User {
