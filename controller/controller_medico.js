@@ -70,7 +70,7 @@ const setLoginMedico = async function(crm, senha){
         let dadosMedico = await medicoDAO.loginMedico(crm, senha);
 
         if (dadosMedico.length === 0) {
-            return { status_code: 400, message: 'Empresa não encontrada ou senha incorreta' };
+            return { status_code: 400, message: 'CRM ou Senha incorreta' };
         }
 
         console.log(crm);
