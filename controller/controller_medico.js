@@ -346,6 +346,49 @@ const setFiltrarPorEspecialidade = async function(especialidade){
    }
 }
 
+const setListarConsultaById = async function(id){
+    try {
+
+        // Recebe o id do filme
+    let idMedico = id
+
+    //Cria o objeto JSON
+    let medicoJSON = {}
+
+
+    //Validação para verificar se o id é válido(Vazio, indefinido e não numérico)
+    if(idMedico == '' || idMedico == undefined || isNaN(idMedico)){
+        return message.ERROR_INVALID_ID // 400
+    }else{
+
+        //Encaminha para o DAO localizar o id do filme 
+        let dadosMedico = await medicoDAO.selectConsultaById(idMedico)
+
+        // Validação para verificar se existem dados de retorno
+        if(dadosMedico){
+
+            // Validação para verificar a quantidade de itens encontrados.
+            if(dadosMedico.length > 0){
+                //Criar o JSON de retorno
+                medicoJSON.medico = dadosMedico
+                medicoJSON.status_code = 200
+    
+                
+                return medicoJSON
+            }else{
+                return message.ERROR_NOT_FOUND // 404
+            }
+
+        }else{
+            return message.ERROR_INTERNAL_SERVER_DB // 500
+        }
+    }
+   } catch (error) {
+       console.log(error)
+       return message.ERROR_INTERNAL_SERVER_DB
+   }
+}
+
 module.exports = {
     setInserir,
     setAtualizar,
@@ -354,5 +397,6 @@ module.exports = {
     setListarPorId,
     setLoginMedico,
     setFiltrar,
-    setFiltrarPorEspecialidade
+    setFiltrarPorEspecialidade,
+    setListarConsultaById
 }

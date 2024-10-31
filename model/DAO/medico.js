@@ -194,6 +194,23 @@ const selectNameById = async function(id){
         }
 }
 
+const selectConsultaById = async function(id){
+    try {
+        // Realiza a busca do genero pelo ID
+        let sql = `vw_consultas_medico where id_medico = ${id}`;
+    
+        // Executa no banco de dados o script sql
+        let rsUsuario = await prisma.$queryRawUnsafe(sql);
+
+            return rsUsuario;
+    
+        } catch (error) {
+            console.log(error);
+            return false;
+            
+        }
+}
+
 module.exports = {
     insert,
     update,
@@ -204,5 +221,6 @@ module.exports = {
     loginMedico,
     filter,
     filterBySpecialty,
-    selectNameById
+    selectNameById,
+    selectConsultaById
 }

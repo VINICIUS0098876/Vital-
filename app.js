@@ -324,6 +324,18 @@ const bodyParserJSON = bodyParser.json()
         response.json(dadosMedico)
     })
 
+    app.get('/v1/vital/Consulta/:id', cors(), async function(request,response,next){
+
+        // recebe o id da requisição
+        let idMedico = request.params.id
+    
+        //encaminha o id para a acontroller buscar o filme
+        let dadosMedico = await controllerMedico.setListarConsultaById(idMedico)
+    
+        response.status(dadosMedico.status_code);
+        response.json(dadosMedico);
+    })
+
     app.get('/v1/vital/filtroMedicoEspecialidade/filtro', cors(), async function(request, response, next){
         let especialidade = request.query.especialidade
         let dadosMedico = await controllerMedico.setFiltrarPorEspecialidade(especialidade)
