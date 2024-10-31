@@ -264,7 +264,7 @@ const bodyParserJSON = bodyParser.json()
     })
 
     /*********************** MEDICO ***********************************/
-    app.post('/v1/vital/medico', cors(), bodyParserJSON, async function (request, response,next ){
+    app.post('/v2/vital/medico', cors(), bodyParserJSON, async function (request, response,next ){
 
 
         // recebe o ContentType com os tipos de dados encaminhados na requisição
