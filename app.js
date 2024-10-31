@@ -18,8 +18,7 @@ const cors = require('cors')
 
 const app = express()
 
-// Ativa as confgurações de cors
-app.use(cors())
+
 
 app.use((request, response, next) => {
 
@@ -29,7 +28,8 @@ app.use((request, response, next) => {
     // Permite especificar como a API, sera requisitada ('GET', 'POST', 'PUT' e 'DELETE')
     response.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
 
-    
+    // Ativa as confgurações de cors
+    app.use(cors())
     
     next()
 })
