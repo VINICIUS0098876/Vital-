@@ -90,8 +90,8 @@ const listById = async function(id){
         let sql = `select * from vw_todas_consultas where id_consulta = ${id}`;
     
         // Executa no banco de dados o script sql
+        console.log(sql);
         let rsUsuario = await prisma.$queryRawUnsafe(sql);
-
             return rsUsuario;
     
         } catch (error) {

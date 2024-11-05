@@ -200,14 +200,14 @@ const setListarPorId = async function(id){
     //Cria o objeto JSON
     let JSON = {}
 
-
     //Validação para verificar se o id é válido(Vazio, indefinido e não numérico)
     if(idConsulta == '' || idConsulta == undefined || isNaN(idConsulta)){
         return message.ERROR_INVALID_ID // 400
     }else{
-
         //Encaminha para o DAO localizar o id do filme 
         let dadosConsulta = await consultaDAO.listById(idConsulta)
+        console.log(dadosConsulta);                                                                                             
+
 
         // Validação para verificar se existem dados de retorno
         if(dadosConsulta){

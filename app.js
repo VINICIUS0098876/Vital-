@@ -324,7 +324,7 @@ const bodyParserJSON = bodyParser.json()
         response.json(dadosMedico)
     })
 
-    app.get('/v1/vital/Consulta/:id', cors(), async function(request,response,next){
+    app.get('/v1/vital/consulta/medico/:id', cors(), async function(request,response,next){
 
         // recebe o id da requisição
         let idMedico = request.params.id
@@ -627,7 +627,7 @@ const bodyParserJSON = bodyParser.json()
 
         // recebe o id da requisição
         let idConsulta = request.params.id
-    
+        console.log(idConsulta);
         //encaminha o id para a acontroller buscar o filme
         let dadosConsulta = await controllerConsulta.setListarPorId(idConsulta)
     
