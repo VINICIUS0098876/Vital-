@@ -266,6 +266,7 @@ const setFiltrarMedia = async function(media){
             // Validação para verificar a quantidade de itens encontrados.
             if(dadosAvaliacao.length > 0){
                 dadosAvaliacao[0].total_avaliacoes = parseInt(dadosAvaliacao[0].total_avaliacoes)
+                dadosAvaliacao[0].media_avaliacao = parseFloat(dadosAvaliacao[0].media_avaliacao.toFixed(1))
                 
                 //Criar o JSON de retorno
                 JSON.medicos = dadosAvaliacao
