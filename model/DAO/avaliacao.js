@@ -118,7 +118,7 @@ const filter = async function(media){
     m.nome AS nome_medico,
     m.email AS email_medico,
     m.crm,
-    AVG(a.nota) AS media_avaliacao,
+    ROUND(AVG(a.nota), 1) AS media_avaliacao, 
     COUNT(a.id_avaliacao) AS total_avaliacoes
 FROM 
     tbl_medicos m
@@ -127,7 +127,7 @@ LEFT JOIN
 GROUP BY 
     m.id_medico
 HAVING 
-    media_avaliacao >= ${media};`
+    AVG(a.nota) >= ${media};`
 
         let sqlID = await prisma.$queryRawUnsafe(sql)
 
