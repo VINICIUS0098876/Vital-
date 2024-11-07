@@ -111,11 +111,39 @@ const ID = async function(){
     }
 }
 
+const filter = async function(media){
+    try {
+        let sql = `SELECT 
+    m.id_medico,
+    m.nome AS nome_medico,
+    m.email AS email_medico,
+    m.crm,
+    AVG(a.nota) AS media_avaliacao,
+    COUNT(a.id_avaliacao) AS total_avaliacoes
+FROM 
+    tbl_medicos m
+LEFT JOIN 
+    tbl_avaliacoes a ON m.id_medico = a.id_medico
+GROUP BY 
+    m.id_medico
+HAVING 
+    media_avaliacao >= ${media};`
+
+        let sqlID = await prisma.$queryRawUnsafe(sql)
+
+        return sqlID
+    } catch (error) {
+        console.log(error);
+        return false
+    }
+}
+
 module.exports = {
     insert, 
     update,
     deletar,
     listAll,
     listById,
-    ID
+    ID,
+    filter
 }

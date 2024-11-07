@@ -60,7 +60,6 @@ const update = async function(dadosEmpresa, idEmpresa){
     try {
         sql = `update tbl_empresa set
         nome_empresa = '${dadosEmpresa.nome_empresa}',
-        nome = '${dadosEmpresa.nome}',
         nome_proprietario = '${dadosEmpresa.nome_proprietario}',
         email = '${dadosEmpresa.email}',
         senha = '${dadosEmpresa.senha}',

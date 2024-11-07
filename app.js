@@ -589,6 +589,14 @@ const bodyParserJSON = bodyParser.json()
     
     })
 
+    app.get('/v1/vital/media/filtro', cors(), async function(request, response, next){        
+        let media = request.query.media
+        let dadosAvaliacao = await controllerAvaliacao.setFiltrarMedia(media)
+
+        response.status(dadosAvaliacao.status_code)
+        response.json(dadosAvaliacao)
+    })
+
      /*********************** CONSULTAS ***********************************/
      app.post('/v2/vital/consulta', cors(), bodyParserJSON, async function (request, response,next ){
 

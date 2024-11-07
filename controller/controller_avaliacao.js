@@ -244,10 +244,55 @@ const setListarPorId = async function(id){
    }
 }
 
+const setFiltrarMedia = async function(media){
+    try {
+        // Recebe o nome da especialidade
+        let mediaMedico = media
+    //Cria o objeto JSON
+    let JSON = {}
+
+    //Validação para verificar se o id é válido(Vazio, indefinido e não numérico)
+    if(mediaMedico == '' || mediaMedico == undefined){
+        return message.ERROR_INVALID_ID // 400
+    }else{
+        
+        //Encaminha para o DAO localizar o id do filme 
+        let dadosAvaliacao = await avaliacaoDAO.filter(media)
+        
+        
+        // Validação para verificar se existem dados de retorno
+        if(dadosAvaliacao){
+            
+            // Validação para verificar a quantidade de itens encontrados.
+            if(dadosAvaliacao.length > 0){
+                dadosAvaliacao[0].total_avaliacoes = parseInt(dadosAvaliacao[0].total_avaliacoes)
+                
+                //Criar o JSON de retorno
+                JSON.medicos = dadosAvaliacao
+                JSON.quantidade = dadosAvaliacao.length
+                JSON.status_code = 200
+    
+                
+                return JSON
+            }else{
+                return message.ERROR_NOT_FOUND // 404
+            }
+
+        }else{
+            return message.ERROR_INTERNAL_SERVER_DB // 500
+        }
+    }
+   } catch (error) {
+       console.log(error)
+       return message.ERROR_INTERNAL_SERVER_DB
+   }
+}
+
 module.exports = {
     setInserir,
     setUpdate,
     setDeletar,
     setListar,
-    setListarPorId
+    setListarPorId,
+    setFiltrarMedia
 }

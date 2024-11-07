@@ -114,7 +114,6 @@ const setAtualizar = async function(id, dadoAtualizado, contentType){
                 
                     //Validação de campos obrigatórios ou com digitação inválida
                     if(dadoAtualizado.nome_empresa == ''    || dadoAtualizado.nome_empresa == undefined       ||  dadoAtualizado.nome_empresa == null               || dadoAtualizado.nome_empresa.length > 100 ||
-                    dadoAtualizado.nome == ''  ||   dadoAtualizado.nome == undefined  || dadoAtualizado.nome == null   || dadoAtualizado.nome.length > 100 ||
                     dadoAtualizado.nome_proprietario == '' ||  dadoAtualizado.nome_proprietario == undefined || dadoAtualizado.nome_proprietario == null  || dadoAtualizado.nome_proprietario.length > 100 ||
                     dadoAtualizado.email == '' ||  dadoAtualizado.email == undefined || dadoAtualizado.email == null  || dadoAtualizado.email.length > 255 ||
                     dadoAtualizado.senha == '' ||  dadoAtualizado.senha == undefined || dadoAtualizado.senha == null  || dadoAtualizado.senha.length > 18 ||
