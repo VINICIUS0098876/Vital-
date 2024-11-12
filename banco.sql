@@ -93,6 +93,8 @@ FROM
 JOIN
     tbl_endereco_empresa e ON u.id_empresa = e.id_empresa;
    
+    select * from tbl_medicos;
+   
 
 CREATE TABLE tbl_endereco_empresa(
 id_endereco_empresa INT PRIMARY KEY AUTO_INCREMENT,
@@ -119,7 +121,6 @@ CREATE TABLE tbl_usuarios (
     FOREIGN KEY (id_sexo) REFERENCES tbl_sexo(id_sexo)
 );
 
-
 -- Tabela de médicos
 CREATE TABLE tbl_medicos (
     id_medico INT AUTO_INCREMENT PRIMARY KEY,
@@ -133,6 +134,10 @@ CREATE TABLE tbl_medicos (
     FOREIGN KEY (id_empresa) REFERENCES tbl_empresa(id_empresa) ON DELETE CASCADE -- Se empresa for excluída, médicos são excluídos
 );
 
+ALTER TABLE tbl_medicos
+ADD COLUMN foto_medico VARCHAR(255);
+
+
 -- Procedure Cadastrar médico na última empresa cadastrada
 DELIMITER $$
 
@@ -142,7 +147,8 @@ CREATE PROCEDURE sp_inserir_medico_ultima_empresa(
     IN p_senha VARCHAR(255),
     IN p_telefone VARCHAR(20),
     IN p_crm VARCHAR(20),
-    IN p_data_nascimento DATE
+    IN p_data_nascimento DATE,
+    IN p_foto_medico VARCHAR(255)
 )
 BEGIN
     DECLARE last_empresa_id INT;
@@ -157,8 +163,8 @@ BEGIN
 
 
         -- Insere o médico associado à última empresa cadastrada
-        INSERT INTO tbl_medicos (id_empresa, nome, email, senha, telefone, crm, data_nascimento)
-        VALUES (last_empresa_id, p_nome, p_email, p_senha, p_telefone, p_crm, p_data_nascimento);
+        INSERT INTO tbl_medicos (id_empresa, nome, email, senha, telefone, crm, data_nascimento, foto_medico)
+        VALUES (last_empresa_id, p_nome, p_email, p_senha, p_telefone, p_crm, p_data_nascimento, p_foto_medico);
 
 
     ELSE
@@ -169,6 +175,7 @@ BEGIN
 END$$
 
 DELIMITER ;
+
 CALL sp_inserir_medico_ultima_empresa(
     'Dra. Ana Pereira',            -- Nome do médico
     'dra.ana@email.com',           -- Email do médico
@@ -177,31 +184,7 @@ CALL sp_inserir_medico_ultima_empresa(
     'CRM987654',                   -- CRM do médico
     '1980-05-15'                   -- Data de nascimento
 );
-    
-    CREATE VIEW vw_medico_empresa AS
-SELECT
-    m.id_medico,
-    m.nome AS nome_medico,
-    m.email AS email_medico,
-    m.telefone AS telefone_medico,
-    m.crm,
-    m.data_nascimento AS data_nascimento_medico,
-    e.id_empresa,
-    e.nome_empresa,
-    e.nome_proprietario,
-    e.cnpj,
-    e.email AS email_empresa,
-    e.telefone,
-    e.telefone_clinica,
-    es.nome -- mostra as especialidades
-FROM
-    tbl_medicos m
-JOIN
-    tbl_empresa e ON m.id_empresa = e.id_empresa
-JOIN
-    tbl_medico_especialidade me ON m.id_medico = me.id_medico
-JOIN
-    tbl_especialidades es ON me.id_especialidade = es.id_especialidade;
+   
 
 DELIMITER $$
 CREATE PROCEDURE sp_inserir_medico_com_especialidades(
@@ -211,7 +194,8 @@ CREATE PROCEDURE sp_inserir_medico_com_especialidades(
     IN p_telefone VARCHAR(20),
     IN p_crm VARCHAR(20),
     IN p_data_nascimento DATE,
-    IN p_especialidades VARCHAR(255) -- Lista de especialidades separadas por vírgula
+    IN p_especialidades VARCHAR(255),
+IN p_foto_medico VARCHAR(255)
 )
 BEGIN
     DECLARE last_medico_id INT;
@@ -219,7 +203,7 @@ BEGIN
     DECLARE especialidade_id INT;
 
     -- Inserir o médico na tabela tbl_medicos, associado à última empresa cadastrada
-    CALL sp_inserir_medico_ultima_empresa(p_nome, p_email, p_senha, p_telefone, p_crm, p_data_nascimento);
+    CALL sp_inserir_medico_ultima_empresa(p_nome, p_email, p_senha, p_telefone, p_crm, p_data_nascimento, p_foto_medico);
    
     -- Pegar o ID do médico recém-cadastrado
     SET last_medico_id = LAST_INSERT_ID();
@@ -247,16 +231,21 @@ BEGIN
 
 END$$
 DELIMITER ;
-CALL sp_inserir_medico_com_especialidades(
+CALL sp_inserir_medico_com_especialidades
+(
     'Dr. João Silva',
     'joao.silva@hospital.com',
     'senhaSegura123',
     '(11) 99999-9999',
     '126541-SP',
     '1980-05-20',
+    'teste.com',
     'Dermatologista' -- Especialidades separadas por vírgula
 );
 
+select * from tbl_medico_especialidade;
+
+drop procedure sp_inserir_medico_com_especialidades;
 -- Tabela de especialidades
 CREATE TABLE tbl_especialidades (
     id_especialidade INT AUTO_INCREMENT PRIMARY KEY,
@@ -326,10 +315,31 @@ CALL sp_inserir_especialidade_com_empresa(
     'https://link_da_imagem.com/ortopedista.jpg'
 );
 
+select * from vw_medicos_com_especialidade;
+
+CREATE VIEW vw_medicos_com_especialidade AS
+SELECT
+    m.id_medico,
+    m.id_empresa,
+    m.nome AS nome_medico,
+    m.email AS email_medico,
+    m.telefone AS telefone_medico,
+    m.crm,
+    m.data_nascimento AS data_nascimento_medico,
+    m.foto_medico,
+    e.nome AS especialidade
+FROM
+    tbl_medicos m
+JOIN
+    tbl_medico_especialidade me ON m.id_medico = me.id_medico
+JOIN
+    tbl_especialidades e ON me.id_especialidade = e.id_especialidade;
+
+
 -- Tabela de avaliações
 CREATE TABLE tbl_avaliacoes (
     id_avaliacao INT AUTO_INCREMENT PRIMARY KEY,
-	id_usuario INT,
+id_usuario INT,
     id_medico INT,
     nota TINYINT NOT NULL CHECK (nota BETWEEN 1 AND 5), -- Nota de 1 a 5
     comentario TEXT,
@@ -415,7 +425,7 @@ BEGIN
     -- Insere a consulta associada ao médico, especialidade e à última empresa cadastrada
     INSERT INTO tbl_consultas (id_medico, id_especialidade, id_empresa, detalhes_consulta, dias_consulta, horas_consulta)
     VALUES (v_id_medico, v_id_especialidade, v_id_empresa, p_detalhes_consulta, p_dias_consulta, p_horas_consulta);
-    
+   
 END$$
 
 DELIMITER ;
@@ -429,7 +439,7 @@ CALL sp_inserir_consulta_por_nome(
 );
 
 CREATE VIEW vw_todas_consultas AS
-SELECT 
+SELECT
     c.id_consulta,
     c.detalhes_consulta,
     c.dias_consulta,
@@ -437,15 +447,15 @@ SELECT
     m.nome AS nome_medico,
     e.nome AS nome_especialidade,
     emp.nome_empresa
-FROM 
+FROM
     tbl_consultas c
-INNER JOIN 
+INNER JOIN
     tbl_medicos m ON c.id_medico = m.id_medico
-INNER JOIN 
+INNER JOIN
     tbl_especialidades e ON c.id_especialidade = e.id_especialidade
-INNER JOIN 
+INNER JOIN
     tbl_empresa emp ON c.id_empresa = emp.id_empresa
-ORDER BY 
+ORDER BY
     c.id_consulta DESC;
 
 
@@ -505,20 +515,6 @@ JOIN
 CREATE INDEX idx_email_usuario ON tbl_usuarios(email);
 CREATE INDEX idx_crm_medico ON tbl_medicos(crm);
 
-CREATE VIEW vw_usuarios_enderecos AS
-SELECT
-    u.id_usuario,
-    u.nome,
-    u.email,
-    u.senha,
-    u.cpf,
-    s.id_sexo,
-    u.data_nascimento
-FROM
-    tbl_usuarios u
-JOIN
-    tbl_sexo s ON u.id_sexo = s.id_sexo;
-    
 DELIMITER $$
 
 CREATE TRIGGER trg_delete_usuario_endereco
@@ -531,6 +527,7 @@ BEGIN
 END$$
 
 DELIMITER ;
+
 
 CREATE VIEW vw_empresa_completa AS
 SELECT
