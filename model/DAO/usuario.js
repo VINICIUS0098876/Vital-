@@ -98,7 +98,7 @@ const deleteUsuario = async function(id){
 
 const selectAllUsuario = async function(){
     try {
-        let sql = 'SELECT * FROM vw_usuarios_enderecos'; 
+        let sql = 'SELECT * FROM tbl_usuarios'; 
 
     let rsUsuario = await prisma.$queryRawUnsafe(sql)
 
