@@ -1,7 +1,7 @@
 // Import do arquivo responsavel pela interação com DB(model)
 const { application } = require('express')
 const medicoDAO = require('../model/DAO/medico.js')
-const especialidadeDAO = require('../model/DAO/especialidade.js')
+const empresaDAO = require('../model/DAO/empresa.js')
 
 
 // Import do arquivo de configuração do projeto
@@ -187,10 +187,10 @@ const setListar = async function(){
 
         if(dadosMedico.length > 0){
 
-             //for(let medico of dadosMedico){
-                // let medicoEspecialidade = await especialidadeDAO.listById(medico.id_especialidade)
-               //  medico.especialidade = medicoEspecialidade
-             //}
+             for(let medico of dadosMedico){
+                let medicoEmpresa = await empresaDAO.ListById(medico.id_empresa)
+                medico.empresa = medicoEmpresa
+             }
 
             medicoJSON.medicos = dadosMedico
             medicoJSON.quantidade = dadosMedico.length
