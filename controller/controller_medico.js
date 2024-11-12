@@ -189,6 +189,7 @@ const setListar = async function(){
 
              for(let medico of dadosMedico){
                 let medicoEmpresa = await empresaDAO.ListById(medico.id_empresa)
+                delete medico.id_empresa
                 medico.empresa = medicoEmpresa
              }
 
