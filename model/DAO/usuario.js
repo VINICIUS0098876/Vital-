@@ -15,12 +15,13 @@ const prisma = new PrismaClient()
 
 const insertUsuario = async function(dadosUsuario){
     try {
-        const sql = `insert into tbl_usuarios(nome, email, cpf, id_sexo, senha, data_nascimento)values('${dadosUsuario.nome}',
+        const sql = `insert into tbl_usuarios(nome, email, cpf, id_sexo, senha, data_nascimento, foto)values('${dadosUsuario.nome}',
         '${dadosUsuario.email}',
         '${dadosUsuario.cpf}',
         '${dadosUsuario.id_sexo}',
         '${dadosUsuario.senha}',
-        '${dadosUsuario.data_nascimento}')`
+        '${dadosUsuario.data_nascimento}',
+        '${dadosUsuario.foto}')`
         console.log(sql)
         
         let result = await prisma.$executeRawUnsafe(sql)
@@ -62,7 +63,8 @@ const updateUsuario = async function(dadosUsuario, idUsuario){
         cpf = '${dadosUsuario.cpf}',
         id_sexo = '${dadosUsuario.id_sexo}',
         senha = '${dadosUsuario.senha}',
-        data_nascimento = '${dadosUsuario.data_nascimento}'
+        data_nascimento = '${dadosUsuario.data_nascimento}',
+        foto = '${dadosUsuario.foto}'
         where tbl_usuarios.id_usuario = ${idUsuario}`
         
         console.log(sql)

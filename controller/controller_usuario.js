@@ -25,8 +25,8 @@ const setInserirUsuario = async function(dadosUsuario, contentType){
                dadosUsuario.cpf == '' ||  dadosUsuario.cpf == undefined || dadosUsuario.cpf == null  || dadosUsuario.cpf.length > 15 ||
                dadosUsuario.id_sexo == '' ||  dadosUsuario.id_sexo == undefined || dadosUsuario.id_sexo == null  || dadosUsuario.id_sexo.length > 20 ||
                dadosUsuario.senha == '' ||  dadosUsuario.senha == undefined || dadosUsuario.senha == null  || dadosUsuario.senha.length > 255 ||
-               dadosUsuario.data_nascimento == '' ||  dadosUsuario.data_nascimento == undefined || dadosUsuario.data_nascimento == null  || dadosUsuario.data_nascimento.length > 10
-
+               dadosUsuario.data_nascimento == '' ||  dadosUsuario.data_nascimento == undefined || dadosUsuario.data_nascimento == null  || dadosUsuario.data_nascimento.length > 10 ||
+               dadosUsuario.foto == '' ||  dadosUsuario.foto == undefined || dadosUsuario.foto == null  || dadosUsuario.foto.length > 255 
             ){
 
                 
@@ -119,7 +119,8 @@ const setAtualizarUsuario = async function(id, dadoAtualizado, contentType){
                     dadoAtualizado.email == ''  ||   dadoAtualizado.email == undefined  || dadoAtualizado.email == null   || dadoAtualizado.email.length > 255 ||
                     dadoAtualizado.cpf == '' ||  dadoAtualizado.cpf == undefined || dadoAtualizado.cpf == null  || dadoAtualizado.cpf.length > 15 ||
                     dadoAtualizado.id_sexo == '' ||  dadoAtualizado.id_sexo == undefined || dadoAtualizado.id_sexo == null  || dadoAtualizado.id_sexo.length > 20 ||
-                    dadoAtualizado.senha == '' ||  dadoAtualizado.senha == undefined || dadoAtualizado.senha == null  || dadoAtualizado.senha.length > 255 
+                    dadoAtualizado.senha == '' ||  dadoAtualizado.senha == undefined || dadoAtualizado.senha == null  || dadoAtualizado.senha.length > 255 ||
+                    dadosUsuario.foto == '' ||  dadosUsuario.foto == undefined || dadosUsuario.foto == null  || dadosUsuario.foto.length > 255
      ){
                         return message.ERROR_REQUIRED_FIELDS
                     }
