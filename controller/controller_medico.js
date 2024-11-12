@@ -23,7 +23,8 @@ const setInserir = async function(dadosMedico, contentType){
                dadosMedico.senha == '' ||  dadosMedico.senha == undefined || dadosMedico.senha == null  || dadosMedico.senha.length > 255 ||
                dadosMedico.telefone == '' ||  dadosMedico.telefone == undefined || dadosMedico.telefone == null  || dadosMedico.telefone.length > 20 ||
                dadosMedico.crm == '' ||  dadosMedico.crm == undefined || dadosMedico.crm == null  || dadosMedico.crm.length > 20 ||
-               dadosMedico.data_nascimento == '' ||  dadosMedico.data_nascimento == undefined || dadosMedico.data_nascimento == null  || dadosMedico.data_nascimento.length > 10
+               dadosMedico.data_nascimento == '' ||  dadosMedico.data_nascimento == undefined || dadosMedico.data_nascimento == null  || dadosMedico.data_nascimento.length > 10 ||
+               dadosMedico.foto_medico == '' ||  dadosMedico.foto_medico == undefined || dadosMedico.foto_medico == null  || dadosMedico.foto_medico.length > 255
 
             ){
                 // return do status code 400
@@ -113,7 +114,8 @@ const setAtualizar = async function(id, dadoAtualizado, contentType){
                     dadoAtualizado.senha == '' ||  dadoAtualizado.senha == undefined || dadoAtualizado.senha == null  || dadoAtualizado.senha.length > 255 ||
                     dadoAtualizado.telefone == '' ||  dadoAtualizado.telefone == undefined || dadoAtualizado.telefone == null  || dadoAtualizado.telefone.length > 20 ||
                     dadoAtualizado.crm == '' ||  dadoAtualizado.crm == undefined || dadoAtualizado.crm == null  || dadoAtualizado.crm.length > 20 ||
-                    dadoAtualizado.data_nascimento == '' ||  dadoAtualizado.data_nascimento == undefined || dadoAtualizado.data_nascimento == null  || dadoAtualizado.data_nascimento.length > 10 
+                    dadoAtualizado.data_nascimento == '' ||  dadoAtualizado.data_nascimento == undefined || dadoAtualizado.data_nascimento == null  || dadoAtualizado.data_nascimento.length > 10 ||
+                    dadoAtualizado.foto_medico == '' ||  dadoAtualizado.foto_medico == undefined || dadoAtualizado.foto_medico == null  || dadoAtualizado.foto_medico.length > 255
      ){
                         return message.ERROR_REQUIRED_FIELDS
                     }

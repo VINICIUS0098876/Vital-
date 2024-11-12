@@ -120,7 +120,7 @@ const setAtualizarUsuario = async function(id, dadoAtualizado, contentType){
                     dadoAtualizado.cpf == '' ||  dadoAtualizado.cpf == undefined || dadoAtualizado.cpf == null  || dadoAtualizado.cpf.length > 15 ||
                     dadoAtualizado.id_sexo == '' ||  dadoAtualizado.id_sexo == undefined || dadoAtualizado.id_sexo == null  || dadoAtualizado.id_sexo.length > 20 ||
                     dadoAtualizado.senha == '' ||  dadoAtualizado.senha == undefined || dadoAtualizado.senha == null  || dadoAtualizado.senha.length > 255 ||
-                    dadosUsuario.foto == '' ||  dadosUsuario.foto == undefined || dadosUsuario.foto == null  || dadosUsuario.foto.length > 255
+                    dadoAtualizado.foto == '' ||  dadoAtualizado.foto == undefined || dadoAtualizado.foto == null  || dadoAtualizado.foto.length > 255
      ){
                         return message.ERROR_REQUIRED_FIELDS
                     }
