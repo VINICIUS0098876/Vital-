@@ -113,7 +113,7 @@ const selectAllUsuario = async function(){
 const selectUsuarioById = async function(id){
     try {
         // Realiza a busca do genero pelo ID
-        let sql = `select * from vw_usuarios_enderecos where id_usuario = ${id}`;
+        let sql = `select * from tbl_usuarios where id_usuario = ${id}`;
     
         // Executa no banco de dados o script sql
         let rsUsuario = await prisma.$queryRawUnsafe(sql);
