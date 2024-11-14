@@ -47,7 +47,7 @@ const bodyParserJSON = bodyParser.json()
 
 
 /*********************** USUARIO ***********************************/
-    app.post('/v1/vital/usuario', cors(), bodyParserJSON, async function (request, response,next ){
+    app.post('/v1/vital/inserir/usuario', cors(), bodyParserJSON, async function (request, response,next ){
 
         // recebe o ContentType com os tipos de dados encaminhados na requisição
         let contentType = request.headers['content-type'];
