@@ -115,7 +115,8 @@ const setAtualizar = async function(id, dadoAtualizado, contentType){
                     dadoAtualizado.telefone == '' ||  dadoAtualizado.telefone == undefined || dadoAtualizado.telefone == null  || dadoAtualizado.telefone.length > 20 ||
                     dadoAtualizado.crm == '' ||  dadoAtualizado.crm == undefined || dadoAtualizado.crm == null  || dadoAtualizado.crm.length > 20 ||
                     dadoAtualizado.data_nascimento == '' ||  dadoAtualizado.data_nascimento == undefined || dadoAtualizado.data_nascimento == null  || dadoAtualizado.data_nascimento.length > 10 ||
-                    dadoAtualizado.foto_medico == '' ||  dadoAtualizado.foto_medico == undefined || dadoAtualizado.foto_medico == null  || dadoAtualizado.foto_medico.length > 255
+                    dadoAtualizado.foto_medico == '' ||  dadoAtualizado.foto_medico == undefined || dadoAtualizado.foto_medico == null  || dadoAtualizado.foto_medico.length > 255 ||
+                    dadoAtualizado.descricao == '' ||  dadoAtualizado.descricao == undefined || dadoAtualizado.descricao == null  || dadoAtualizado.descricao.length > 500
      ){
                         return message.ERROR_REQUIRED_FIELDS
                     }

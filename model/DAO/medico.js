@@ -60,7 +60,8 @@ const update = async function(dadosMedico, idMedico){
         telefone = '${dadosMedico.telefone}',
         crm = '${dadosMedico.crm}',
         data_nascimento = '${dadosMedico.data_nascimento}',
-        foto_medico = '${dadosMedico.foto_medico}'
+        foto_medico = '${dadosMedico.foto_medico}',
+        descricao = '${dadosMedico.descricao}'
         where tbl_medicos.id_medico = ${idMedico}`
         
         console.log(sql)
