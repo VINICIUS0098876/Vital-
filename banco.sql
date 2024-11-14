@@ -135,8 +135,9 @@ CREATE TABLE tbl_medicos (
 );
 
 ALTER TABLE tbl_medicos
-ADD COLUMN foto_medico VARCHAR(255);
+ADD COLUMN descricao TEXT;
 
+desc tbl_medicos;
 
 -- Procedure Cadastrar médico na última empresa cadastrada
 DELIMITER $$
@@ -148,7 +149,8 @@ CREATE PROCEDURE sp_inserir_medico_ultima_empresa(
     IN p_telefone VARCHAR(20),
     IN p_crm VARCHAR(20),
     IN p_data_nascimento DATE,
-    IN p_foto_medico VARCHAR(255)
+    IN p_foto_medico VARCHAR(255),
+    IN p_descricao TEXT
 )
 BEGIN
     DECLARE last_empresa_id INT;
@@ -163,8 +165,8 @@ BEGIN
 
 
         -- Insere o médico associado à última empresa cadastrada
-        INSERT INTO tbl_medicos (id_empresa, nome, email, senha, telefone, crm, data_nascimento, foto_medico)
-        VALUES (last_empresa_id, p_nome, p_email, p_senha, p_telefone, p_crm, p_data_nascimento, p_foto_medico);
+        INSERT INTO tbl_medicos (id_empresa, nome, email, senha, telefone, crm, data_nascimento, foto_medico, descricao)
+        VALUES (last_empresa_id, p_nome, p_email, p_senha, p_telefone, p_crm, p_data_nascimento, p_foto_medico, p_descricao);
 
 
     ELSE
@@ -175,6 +177,8 @@ BEGIN
 END$$
 
 DELIMITER ;
+
+DROP PROCEDURE sp_inserir_medico_ultima_empresa;
 
 CALL sp_inserir_medico_ultima_empresa(
     'Dra. Ana Pereira',            -- Nome do médico
@@ -195,7 +199,8 @@ CREATE PROCEDURE sp_inserir_medico_com_especialidades(
     IN p_crm VARCHAR(20),
     IN p_data_nascimento DATE,
     IN p_especialidades VARCHAR(255),
-IN p_foto_medico VARCHAR(255)
+	IN p_foto_medico VARCHAR(255),
+    IN p_descricao TEXT
 )
 BEGIN
     DECLARE last_medico_id INT;
@@ -203,7 +208,7 @@ BEGIN
     DECLARE especialidade_id INT;
 
     -- Inserir o médico na tabela tbl_medicos, associado à última empresa cadastrada
-    CALL sp_inserir_medico_ultima_empresa(p_nome, p_email, p_senha, p_telefone, p_crm, p_data_nascimento, p_foto_medico);
+    CALL sp_inserir_medico_ultima_empresa(p_nome, p_email, p_senha, p_telefone, p_crm, p_data_nascimento, p_foto_medico, p_descricao);
    
     -- Pegar o ID do médico recém-cadastrado
     SET last_medico_id = LAST_INSERT_ID();
@@ -231,8 +236,7 @@ BEGIN
 
 END$$
 DELIMITER ;
-CALL sp_inserir_medico_com_especialidades
-(
+CALL sp_inserir_medico_com_especialidades(
     'Dr. João Silva',
     'joao.silva@hospital.com',
     'senhaSegura123',
@@ -243,9 +247,6 @@ CALL sp_inserir_medico_com_especialidades
     'Dermatologista' -- Especialidades separadas por vírgula
 );
 
-select * from tbl_medico_especialidade;
-
-drop procedure sp_inserir_medico_com_especialidades;
 -- Tabela de especialidades
 CREATE TABLE tbl_especialidades (
     id_especialidade INT AUTO_INCREMENT PRIMARY KEY,
@@ -327,6 +328,7 @@ SELECT
     m.crm,
     m.data_nascimento AS data_nascimento_medico,
     m.foto_medico,
+    m.descricao,
     e.nome AS especialidade
 FROM
     tbl_medicos m
@@ -335,6 +337,7 @@ JOIN
 JOIN
     tbl_especialidades e ON me.id_especialidade = e.id_especialidade;
 
+drop view vw_medicos_com_especialidade;
 
 -- Tabela de avaliações
 CREATE TABLE tbl_avaliacoes (
