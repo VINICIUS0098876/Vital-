@@ -29,7 +29,10 @@ app.use((request, response, next) => {
     response.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
 
     // Ativa as confgurações de cors
-    app.use(cors())
+    app.use(cors({
+        origin:"http://localhost:3000",
+        methods: ["GET", "POST", "DELETE", "PUT", "OPTIONS", 'PATCH']
+    }))
     
     next()
 })
