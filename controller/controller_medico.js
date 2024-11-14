@@ -24,8 +24,8 @@ const setInserir = async function(dadosMedico, contentType){
                dadosMedico.telefone == '' ||  dadosMedico.telefone == undefined || dadosMedico.telefone == null  || dadosMedico.telefone.length > 20 ||
                dadosMedico.crm == '' ||  dadosMedico.crm == undefined || dadosMedico.crm == null  || dadosMedico.crm.length > 20 ||
                dadosMedico.data_nascimento == '' ||  dadosMedico.data_nascimento == undefined || dadosMedico.data_nascimento == null  || dadosMedico.data_nascimento.length > 10 ||
-               dadosMedico.foto_medico == '' ||  dadosMedico.foto_medico == undefined || dadosMedico.foto_medico == null  || dadosMedico.foto_medico.length > 255
-
+               dadosMedico.foto_medico == '' ||  dadosMedico.foto_medico == undefined || dadosMedico.foto_medico == null  || dadosMedico.foto_medico.length > 255 ||
+               dadosMedico.descricao == '' ||  dadosMedico.descricao == undefined || dadosMedico.descricao == null  || dadosMedico.descricao.length > 500
             ){
                 // return do status code 400
                 return message.ERROR_REQUIRED_FIELDS

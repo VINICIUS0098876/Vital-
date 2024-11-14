@@ -14,9 +14,9 @@ const insert = async function(dadosMedico){
             '${dadosMedico.crm}',
             '${dadosMedico.data_nascimento}',
             '${dadosMedico.especialidades}',
-            '${dadosMedico.foto_medico}'
-        );
-        `
+            '${dadosMedico.foto_medico}',
+            '${dadosMedico.descricao}'
+        ); `
         console.log(sql)
        
         let result = await prisma.$executeRawUnsafe(sql)
