@@ -70,7 +70,7 @@ const deletar = async function(id){
 
 const listAll = async function(){
     try {
-        let sql = 'SELECT * FROM vw_todas_consultas';
+        let sql = 'SELECT * FROM tbl_consultas';
 
 
     let rsUsuario = await prisma.$queryRawUnsafe(sql)

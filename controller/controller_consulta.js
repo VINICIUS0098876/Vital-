@@ -1,6 +1,9 @@
 // Import do arquivo responsavel pela interação com DB(model)
 const { application } = require('express')
 const consultaDAO = require('../model/DAO/consulta.js')
+const especialidadeDAO = require('../model/DAO/especialidade.js')
+const medicoDAO = require('../model/DAO/medico.js')
+const empresaDAO = require('../model/DAO/empresa.js')
 // Import do arquivo de configuração do projeto
 const message = require('../modulo/config.js')
 const { join } = require('@prisma/client/runtime/library.js')
@@ -165,10 +168,17 @@ const setListar = async function(){
         if(dadosConsulta.length> 0){
 
 
-            // for(let usuario of dadosUsuario){
-            //     let sexoUsuario = await sexoDAO.selectByIdSexo(usuario.id_sexo)
-            //     usuario.sexo = sexoUsuario
-            // }
+            for(let consulta of dadosConsulta){
+                let medico = await medicoDAO.listById(consulta.id_medico)
+                let especialidade = await especialidadeDAO.listById(consulta.id_especialidade)
+                let empresa = await empresaDAO.ListById(consulta.id_empresa)
+                delete consulta.id_medico
+                delete consulta.id_especialidade
+                delete consulta.id_empresa
+                consulta.medico = medico
+                consulta.especialidade = especialidade
+                consulta.empresa = empresa
+            }
 
 
             JSON.consultas = dadosConsulta
