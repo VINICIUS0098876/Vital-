@@ -290,11 +290,66 @@ const setFiltrarMedia = async function(media){
    }
 }
 
+const setFiltrarAvaliacaoMedico = async function(id){
+    try {
+        // Recebe o id do filme
+     
+    let idMedico = id
+
+    //Cria o objeto JSON
+    let JSON = {}
+
+
+    //Validação para verificar se o id é válido(Vazio, indefinido e não numérico)
+    if(idMedico == '' || idMedico == undefined || isNaN(idMedico)){
+        return message.ERROR_INVALID_ID // 400
+    }else{
+
+        //Encaminha para o DAO localizar o id do filme 
+        let dadosMedico = await avaliacaoDAO.avaliacaoById(idMedico)
+
+        // Validação para verificar se existem dados de retorno
+        if(dadosMedico){
+
+            // Validação para verificar a quantidade de itens encontrados.
+            if(dadosMedico.length > 0){
+
+                // for(let usuario of dadosAvaliacao){
+                //     let nomeUsuario = await usuarioDAO.selectNameById(usuario.id_usuario)
+                //     let nomeMedico = await medicoDAO.selectNameById(usuario.id_medico)
+                //     delete usuario.id_usuario
+                //     delete usuario.id_medico
+                //     usuario.usuario = nomeUsuario
+                //     usuario.medico = nomeMedico
+                // }
+
+
+                //Criar o JSON de retorno
+                JSON.avaliacao = dadosMedico
+                JSON.status_code = 200
+    
+                
+                return JSON
+            }else{
+                return message.ERROR_NOT_FOUND // 404
+            }
+
+        }else{
+            return message.ERROR_INTERNAL_SERVER_DB // 500
+        }
+    }
+   } catch (error) {
+       console.log(error)
+       return message.ERROR_INTERNAL_SERVER_DB
+   }
+}
+
 module.exports = {
     setInserir,
     setUpdate,
     setDeletar,
     setListar,
     setListarPorId,
-    setFiltrarMedia
+    setFiltrarMedia,
+    setFiltrarAvaliacaoMedico
 }

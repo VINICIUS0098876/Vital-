@@ -238,6 +238,14 @@ const setListarPorId = async function(id){
 
             // Validação para verificar a quantidade de itens encontrados.
             if(dadosMedico.length > 0){
+
+                for(let medico of dadosMedico){
+                    let medicoEmpresa = await empresaDAO.ListById(medico.id_empresa)
+                    delete medico.id_empresa
+                    medico.empresa = medicoEmpresa
+                 }
+
+
                 //Criar o JSON de retorno
                 medicoJSON.medico = dadosMedico
                 medicoJSON.status_code = 200
@@ -258,12 +266,12 @@ const setListarPorId = async function(id){
    }
 }
 
-const setFiltrar = async function(crm){
+const setFiltrar = async function(id){
     try {
         
 
         // Recebe o nome da especialidade
-        let crmMedico = crm
+        let idEspecialidade = id
 
         
         
@@ -274,12 +282,12 @@ const setFiltrar = async function(crm){
     
     
     //Validação para verificar se o id é válido(Vazio, indefinido e não numérico)
-    if(crmMedico == '' || crmMedico == undefined){
+    if(idEspecialidade == '' || idEspecialidade == undefined){
         return message.ERROR_INVALID_ID // 400
     }else{
         
         //Encaminha para o DAO localizar o id do filme 
-        let dadosMedico = await medicoDAO.filter(crm)
+        let dadosMedico = await medicoDAO.filter(id)
         
         
         // Validação para verificar se existem dados de retorno

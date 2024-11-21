@@ -25,6 +25,21 @@ const selectByNameSexo = async function(name){
         }
 }
 
+const selectAll = async function(){
+    try {
+        let sql = 'SELECT * FROM tbl_sexo';
+
+
+    let rsUsuario = await prisma.$queryRawUnsafe(sql)
+
+
+    if(rsUsuario.length > 0 )
+    return rsUsuario
+    } catch (error) {
+        console.log(error);
+        return false
+    };
+}
 
 
 const selectByIdSexo = async function(descricao){
@@ -46,5 +61,6 @@ const selectByIdSexo = async function(descricao){
 
 module.exports = {
     selectByIdSexo,
-    selectByNameSexo
+    selectByNameSexo,
+    selectAll
 }

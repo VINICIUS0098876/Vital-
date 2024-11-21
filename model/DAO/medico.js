@@ -112,7 +112,7 @@ const listAll = async function(){
 const listById = async function(id){
     try {
         // Realiza a busca do genero pelo ID
-        let sql = `select * from vw_medico_empresa where id_medico = ${id}`;
+        let sql = `select * from vw_medicos_com_especialidade where id_medico = ${id}`;
     
         // Executa no banco de dados o script sql
         let rsUsuario = await prisma.$queryRawUnsafe(sql);
@@ -139,9 +139,28 @@ const ID = async function(){
     }
 }
 
-const filter = async function(crm){
+const filter = async function(id){
     try {
-        let sql = `select * from tbl_medicos where crm like "%${crm}%"`        
+        let sql = `SELECT 
+    m.id_medico,
+    m.nome AS nome_medico,
+    m.email AS email_medico,
+    m.telefone AS telefone_medico,
+    m.crm,
+    m.foto_medico,
+    m.descricao,
+    e.nome AS especialidade,
+    emp.nome_empresa
+FROM 
+    tbl_medicos m
+JOIN 
+    tbl_medico_especialidade me ON m.id_medico = me.id_medico
+JOIN 
+    tbl_especialidades e ON me.id_especialidade = e.id_especialidade
+JOIN 
+    tbl_empresa emp ON m.id_empresa = emp.id_empresa
+WHERE 
+    e.id_especialidade = ${id}`        
         let rsFilter = await prisma.$queryRawUnsafe(sql)
         return rsFilter
     } catch (error) {
@@ -232,6 +251,8 @@ ORDER BY
             
         }
 }
+
+
 
 module.exports = {
     insert,

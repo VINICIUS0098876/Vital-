@@ -138,6 +138,35 @@ HAVING
     }
 }
 
+const avaliacaoById = async function(id){
+    try {
+        // Realiza a busca do genero pelo ID
+        let sql = `SELECT 
+    a.id_avaliacao,
+    a.nota AS avaliacao_nota,
+    a.comentario AS avaliacao_comentario,
+    a.data_avaliacao AS avaliacao_data,
+    u.nome AS avaliador_nome,
+    u.email AS avaliador_email
+FROM 
+    tbl_avaliacoes a
+LEFT JOIN 
+    tbl_usuarios u ON a.id_usuario = u.id_usuario
+WHERE 
+    a.id_medico = ${id}`;
+    
+        // Executa no banco de dados o script sql
+        let rsUsuario = await prisma.$queryRawUnsafe(sql);
+
+            return rsUsuario;
+    
+        } catch (error) {
+            console.log(error);
+            return false;
+            
+        }
+}
+
 module.exports = {
     insert, 
     update,
@@ -145,5 +174,6 @@ module.exports = {
     listAll,
     listById,
     ID,
-    filter
+    filter,
+    avaliacaoById
 }

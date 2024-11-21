@@ -46,6 +46,7 @@ const bodyParserJSON = bodyParser.json()
     const controllerVideo = require('./controller/controller_video.js')
     const controllerAvaliacao = require('./controller/controller_avaliacao.js')
     const controllerConsulta = require('./controller/controller_consulta.js')
+    const controllerSexo = require('./controller/controller_sexo.js')
 
 
 
@@ -319,12 +320,15 @@ const bodyParserJSON = bodyParser.json()
         }
     });
 
-    app.get('/v1/vital/filtroMedico/filtro', cors(), async function(request, response, next){
-        let crm = request.query.crm
-        let dadosMedico = await controllerMedico.setFiltrar(crm)
-
-        response.status(dadosMedico.status_code)
-        response.json(dadosMedico)
+    app.get('/v1/vital/filtro/medico/:id', cors(), async function(request, response, next){
+         // recebe o id da requisição
+         let idEspecialidade = request.params.id
+    
+         //encaminha o id para a acontroller buscar o filme
+         let dadosMedico = await controllerMedico.setFiltrar(idEspecialidade)
+     
+         response.status(dadosMedico.status_code);
+         response.json(dadosMedico);
     })
 
     app.get('/v1/vital/consulta/medico/:id', cors(), async function(request,response,next){
@@ -600,6 +604,18 @@ const bodyParserJSON = bodyParser.json()
         response.json(dadosAvaliacao)
     })
 
+    app.get('/v2/vital/avaliacao/medico/:id', cors(), async function(request,response,next){
+
+        // recebe o id da requisição
+        let idMedico = request.params.id
+    
+        //encaminha o id para a acontroller buscar o filme
+        let dadosAvaliacao = await controllerAvaliacao.setFiltrarAvaliacaoMedico(idMedico)
+    
+        response.status(dadosAvaliacao.status_code);
+        response.json(dadosAvaliacao);
+    })
+
      /*********************** CONSULTAS ***********************************/
      app.post('/v2/vital/consulta', cors(), bodyParserJSON, async function (request, response,next ){
 
@@ -667,6 +683,34 @@ const bodyParserJSON = bodyParser.json()
         response.status(resultUptadeConsulta.status_code)
         response.json(resultUptadeConsulta)
     
+    })
+
+    /*********************** SEXO ***********************************/
+    app.get('/v1/vital/sexo', cors(),async function (request,response,next){
+
+
+        // chama a função da controller para retornar os filmes;
+        let dadosSexo = await controllerSexo.setListarSexo()
+   
+        // validação para retornar o Json dos filmes ou retornar o erro 404;
+        if(dadosSexo){
+            response.json(dadosSexo);
+            response.status(dadosSexo.status_code);
+        }else{
+            response.json({message: 'Nenhum registro foi encontrado'});
+            response.status(404);
+        }
+    });
+
+    app.get('/v1/vital/sexo/:id', cors(), async function(request,response,next){
+
+        // recebe o id da requisição
+        let idSexo = request.params.id
+        //encaminha o id para a acontroller buscar o filme
+        let dadosSexo = await controllerSexo.setListarById(idSexo)
+    
+        response.status(dadosSexo.status_code);
+        response.json(dadosSexo);
     })
 
     app.listen('8080', function(){
