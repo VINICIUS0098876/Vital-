@@ -604,7 +604,7 @@ const bodyParserJSON = bodyParser.json()
         response.json(dadosAvaliacao)
     })
 
-    app.get('/v2/vital/avaliacao/medico/:id', cors(), async function(request,response,next){
+    app.get('/v1/vital/avaliacao/medico/:id', cors(), async function(request,response,next){
 
         // recebe o id da requisição
         let idMedico = request.params.id

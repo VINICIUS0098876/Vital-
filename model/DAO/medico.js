@@ -224,6 +224,8 @@ const selectConsultaById = async function(id){
     c.detalhes_consulta,
     c.dias_consulta,
     c.horas_consulta,
+    DATE_FORMAT(dias_consulta, '%d/%m/%Y') AS data_formatada,
+    TIME_FORMAT(horas_consulta, "%H:%i:%s") AS hora_formatada,
     m.nome AS nome_medico,
     e.nome AS nome_especialidade,
     emp.nome_empresa

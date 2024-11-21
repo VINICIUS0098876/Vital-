@@ -68,26 +68,27 @@ const deletar = async function(id){
     }
 }
 
-const listAll = async function(){
+const listAll = async function () {
     try {
-        let sql = 'SELECT * FROM tbl_consultas';
+        let sql = "SELECT *, DATE_FORMAT(dias_consulta, '%d/%m/%Y') AS data_formatada, TIME_FORMAT(horas_consulta, '%H:%i:%s') AS hora_formatada  FROM tbl_consultas";
 
+        let rsUsuario = await prisma.$queryRawUnsafe(sql);
 
-    let rsUsuario = await prisma.$queryRawUnsafe(sql)
-
-
-    if(rsUsuario.length > 0 )
-    return rsUsuario
+        if (rsUsuario.length > 0) 
+            return rsUsuario;
+        else 
+            return false;
     } catch (error) {
         console.log(error);
-        return false
-    };
-}
+        return false;
+    }
+};
+
 
 const listById = async function(id){
     try {
         // Realiza a busca do genero pelo ID
-        let sql = `select * from vw_todas_consultas where id_consulta = ${id}`;
+        let sql = `select *, DATE_FORMAT(dias_consulta, '%d/%m/%Y') AS data_formatada, TIME_FORMAT(horas_consulta, "%H:%i:%s") AS hora_formatada from vw_todas_consultas where id_consulta = ${id}`;
     
         // Executa no banco de dados o script sql
         console.log(sql);
