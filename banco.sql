@@ -9,19 +9,6 @@ CREATE TABLE tbl_sexo (
     descricao VARCHAR(20) NOT NULL UNIQUE
 );
 
-
-SELECT DATE_FORMAT(dias_consulta, '%d/%m/%Y') AS data_formatada FROM tbl_consultas;
-
-SELECT TIME_FORMAT(horas_consulta, "%H:%i:%s") AS hora_formatada FROM tbl_consultas;
-
-SELECT 
-    *,
-    DATE_FORMAT(dias_consulta, '%d/%m/%Y') AS data_formatada,
-    TIME_FORMAT(horas_consulta, "%H:%i:%s") AS hora_formatada 
-FROM tbl_consultas;
-
-
-
 -- Inserir sexos padrão
 INSERT INTO tbl_sexo (descricao) VALUES ('Masculino');
 INSERT INTO tbl_sexo (descricao) VALUES ('Feminino');
@@ -148,8 +135,9 @@ CREATE TABLE tbl_medicos (
 );
 
 ALTER TABLE tbl_medicos
-ADD COLUMN foto_medico VARCHAR(255);
+ADD COLUMN descricao TEXT;
 
+desc tbl_medicos;
 
 -- Procedure Cadastrar médico na última empresa cadastrada
 DELIMITER $$
@@ -161,7 +149,8 @@ CREATE PROCEDURE sp_inserir_medico_ultima_empresa(
     IN p_telefone VARCHAR(20),
     IN p_crm VARCHAR(20),
     IN p_data_nascimento DATE,
-    IN p_foto_medico VARCHAR(255)
+    IN p_foto_medico VARCHAR(255),
+    IN p_descricao TEXT
 )
 BEGIN
     DECLARE last_empresa_id INT;
@@ -176,8 +165,8 @@ BEGIN
 
 
         -- Insere o médico associado à última empresa cadastrada
-        INSERT INTO tbl_medicos (id_empresa, nome, email, senha, telefone, crm, data_nascimento, foto_medico)
-        VALUES (last_empresa_id, p_nome, p_email, p_senha, p_telefone, p_crm, p_data_nascimento, p_foto_medico);
+        INSERT INTO tbl_medicos (id_empresa, nome, email, senha, telefone, crm, data_nascimento, foto_medico, descricao)
+        VALUES (last_empresa_id, p_nome, p_email, p_senha, p_telefone, p_crm, p_data_nascimento, p_foto_medico, p_descricao);
 
 
     ELSE
@@ -188,6 +177,8 @@ BEGIN
 END$$
 
 DELIMITER ;
+
+DROP PROCEDURE sp_inserir_medico_ultima_empresa;
 
 CALL sp_inserir_medico_ultima_empresa(
     'Dra. Ana Pereira',            -- Nome do médico
@@ -208,7 +199,8 @@ CREATE PROCEDURE sp_inserir_medico_com_especialidades(
     IN p_crm VARCHAR(20),
     IN p_data_nascimento DATE,
     IN p_especialidades VARCHAR(255),
-IN p_foto_medico VARCHAR(255)
+	IN p_foto_medico VARCHAR(255),
+    IN p_descricao TEXT
 )
 BEGIN
     DECLARE last_medico_id INT;
@@ -216,7 +208,7 @@ BEGIN
     DECLARE especialidade_id INT;
 
     -- Inserir o médico na tabela tbl_medicos, associado à última empresa cadastrada
-    CALL sp_inserir_medico_ultima_empresa(p_nome, p_email, p_senha, p_telefone, p_crm, p_data_nascimento, p_foto_medico);
+    CALL sp_inserir_medico_ultima_empresa(p_nome, p_email, p_senha, p_telefone, p_crm, p_data_nascimento, p_foto_medico, p_descricao);
    
     -- Pegar o ID do médico recém-cadastrado
     SET last_medico_id = LAST_INSERT_ID();
@@ -244,8 +236,7 @@ BEGIN
 
 END$$
 DELIMITER ;
-CALL sp_inserir_medico_com_especialidades
-(
+CALL sp_inserir_medico_com_especialidades(
     'Dr. João Silva',
     'joao.silva@hospital.com',
     'senhaSegura123',
@@ -256,9 +247,6 @@ CALL sp_inserir_medico_com_especialidades
     'Dermatologista' -- Especialidades separadas por vírgula
 );
 
-select * from tbl_medico_especialidade;
-
-drop procedure sp_inserir_medico_com_especialidades;
 -- Tabela de especialidades
 CREATE TABLE tbl_especialidades (
     id_especialidade INT AUTO_INCREMENT PRIMARY KEY,
@@ -340,6 +328,7 @@ SELECT
     m.crm,
     m.data_nascimento AS data_nascimento_medico,
     m.foto_medico,
+    m.descricao,
     e.nome AS especialidade
 FROM
     tbl_medicos m
@@ -348,6 +337,7 @@ JOIN
 JOIN
     tbl_especialidades e ON me.id_especialidade = e.id_especialidade;
 
+drop view vw_medicos_com_especialidade;
 
 -- Tabela de avaliações
 CREATE TABLE tbl_avaliacoes (
@@ -384,6 +374,13 @@ FOREIGN KEY (id_especialidade) REFERENCES tbl_especialidades (id_especialidade),
 FOREIGN KEY (id_medico) REFERENCES tbl_medicos (id_medico),
 FOREIGN KEY (id_empresa) REFERENCES tbl_empresa (id_empresa)
 );
+
+ALTER TABLE tbl_consultas
+ADD COLUMN id_status INT DEFAULT 1, -- Status padrão como "Agendada"
+ADD CONSTRAINT FK_status_consulta
+FOREIGN KEY (id_status) REFERENCES tbl_status_consulta (id_status);
+
+desc tbl_consultas;
 
 DELIMITER $$
 
@@ -436,22 +433,39 @@ BEGIN
     END IF;
 
     -- Insere a consulta associada ao médico, especialidade e à última empresa cadastrada
-    INSERT INTO tbl_consultas (id_medico, id_especialidade, id_empresa, detalhes_consulta, dias_consulta, horas_consulta)
-    VALUES (v_id_medico, v_id_especialidade, v_id_empresa, p_detalhes_consulta, p_dias_consulta, p_horas_consulta);
+    INSERT INTO tbl_consultas (id_medico, id_especialidade, id_empresa, detalhes_consulta, dias_consulta, horas_consulta, id_status)
+    VALUES (v_id_medico, v_id_especialidade, v_id_empresa, p_detalhes_consulta, p_dias_consulta, p_horas_consulta, 1);
    
 END$$
 
 DELIMITER ;
 
-CALL sp_inserir_consulta_por_nome(
-    'Vinicius',         -- Nome do médico
-    'Ortopedista',            -- Nome da especialidade
-    'Consulta inicial',       -- Detalhes da consulta
-    '2024-10-01',             -- Data da consulta
-    '10:30:00'                -- Hora da consulta
+drop procedure sp_inserir_consulta_por_nome;
+
+CALL sp_inserir_consulta_por_nome
+(
+    'Gustavo',         -- Nome do médico
+    'Psicologia',            -- Nome da especialidade
+    'Exame do cérebro',       -- Detalhes da consulta
+    '2024-02-04',             -- Data da consulta
+    '14:15:00'                -- Hora da consulta
 );
 
-CREATE VIEW vw_todas_consultas AS
+
+CREATE TABLE tbl_status_consulta (
+    id_status INT AUTO_INCREMENT PRIMARY KEY,
+    descricao VARCHAR(50) NOT NULL UNIQUE
+);
+
+-- Inserir os status padrão
+INSERT INTO tbl_status_consulta (descricao) VALUES
+('Agendada'),
+('Concluída'),
+('Cancelada'),
+('Não Compareceu');
+
+
+CREATE OR REPLACE VIEW vw_todas_consultas AS
 SELECT
     c.id_consulta,
     c.detalhes_consulta,
@@ -459,7 +473,8 @@ SELECT
     c.horas_consulta,
     m.nome AS nome_medico,
     e.nome AS nome_especialidade,
-    emp.nome_empresa
+    emp.nome_empresa,
+    s.descricao AS status_consulta -- Campo do status
 FROM
     tbl_consultas c
 INNER JOIN
@@ -468,8 +483,14 @@ INNER JOIN
     tbl_especialidades e ON c.id_especialidade = e.id_especialidade
 INNER JOIN
     tbl_empresa emp ON c.id_empresa = emp.id_empresa
+LEFT JOIN
+    tbl_status_consulta s ON c.id_status = s.id_status -- Join com a tabela de status
 ORDER BY
     c.id_consulta DESC;
+
+drop view vw_todas_consultas;
+
+select * from vw_todas_consultas;
 
 
 DELIMITER $$

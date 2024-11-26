@@ -172,12 +172,14 @@ const setListar = async function(){
                 let medico = await medicoDAO.listById(consulta.id_medico)
                 let especialidade = await especialidadeDAO.listById(consulta.id_especialidade)
                 let empresa = await empresaDAO.ListById(consulta.id_empresa)
+                let status = await consultaDAO.listByIdStatus(consulta.id_status)
                 delete consulta.id_medico
                 delete consulta.id_especialidade
                 delete consulta.id_empresa
                 consulta.medico = medico
                 consulta.especialidade = especialidade
                 consulta.empresa = empresa
+                consulta.status = status
             }
 
 

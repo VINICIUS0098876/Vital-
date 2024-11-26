@@ -36,7 +36,8 @@ const update = async function(dadosConsulta, idConsulta){
         horas_consulta = '${dadosConsulta.horas_consulta}',
         id_medico = '${dadosConsulta.id_medico}',
         id_especialidade = '${dadosConsulta.id_especialidade}',
-        id_empresa = '${dadosConsulta.id_empresa}'
+        id_empresa = '${dadosConsulta.id_empresa}',
+        id_status = '${dadosConsulta.id_status}'
         where tbl_consultas.id_consulta = ${idConsulta}`
         
         console.log(sql)
@@ -117,11 +118,29 @@ const ID = async function(){
     }
 }
 
+const listByIdStatus = async function(id){
+    try {
+        // Realiza a busca do genero pelo ID
+        let sql = `select * from tbl_status_consulta where id_status = ${id}`;
+    
+        // Executa no banco de dados o script sql
+        console.log(sql);
+        let rsUsuario = await prisma.$queryRawUnsafe(sql);
+            return rsUsuario;
+    
+        } catch (error) {
+            console.log(error);
+            return false;
+            
+        }
+}
+
 module.exports = {
     insert,
     update,
     deletar,
     listAll,
     listById,
-    ID
+    ID,
+    listByIdStatus
 }
