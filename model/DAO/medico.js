@@ -220,27 +220,31 @@ const selectConsultaById = async function(id){
     try {
         // Realiza a busca do genero pelo ID
         let sql = `SELECT 
-    c.id_consulta,
-    c.detalhes_consulta,
-    c.dias_consulta,
-    c.horas_consulta,
-    DATE_FORMAT(dias_consulta, '%d/%m/%Y') AS data_formatada,
-    TIME_FORMAT(horas_consulta, "%H:%i:%s") AS hora_formatada,
-    m.nome AS nome_medico,
-    e.nome AS nome_especialidade,
-    emp.nome_empresa
-FROM 
-    tbl_consultas c
-INNER JOIN 
-    tbl_medicos m ON c.id_medico = m.id_medico
-INNER JOIN 
-    tbl_especialidades e ON c.id_especialidade = e.id_especialidade
-INNER JOIN 
-    tbl_empresa emp ON c.id_empresa = emp.id_empresa
-WHERE 
-    m.id_medico = ${id}
-ORDER BY 
-    c.id_consulta DESC;`;
+        c.id_consulta,
+        c.detalhes_consulta,
+        c.dias_consulta,
+        c.horas_consulta,
+        DATE_FORMAT(c.dias_consulta, '%d/%m/%Y') AS data_formatada,
+        TIME_FORMAT(c.horas_consulta, "%H:%i:%s") AS hora_formatada,
+        m.nome AS nome_medico,
+        e.nome AS nome_especialidade,
+        emp.nome_empresa,
+        s.descricao 
+    FROM 
+        tbl_consultas c
+    INNER JOIN 
+        tbl_medicos m ON c.id_medico = m.id_medico
+    INNER JOIN 
+        tbl_especialidades e ON c.id_especialidade = e.id_especialidade
+    INNER JOIN 
+        tbl_empresa emp ON c.id_empresa = emp.id_empresa
+    INNER JOIN 
+        tbl_status_consulta s ON c.id_status = s.id_status 
+    WHERE 
+        m.id_medico = ${id}
+    ORDER BY 
+        c.id_consulta DESC
+    LIMIT 0, 1000;`;
     
         // Executa no banco de dados o script sql
         let rsUsuario = await prisma.$queryRawUnsafe(sql);
